@@ -1,6 +1,6 @@
 {
-  "name": "Pocket Med Guide",
-  "short_name": "Med Guide",
+  "name": "Medifind",
+  "short_name": "Medifind",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
