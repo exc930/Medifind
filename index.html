@@ -26,7 +26,6 @@
   --shadow:rgba(40,60,90,.14); --logoglow:rgba(255,255,255,.7); --logo:#1f3346;
   --font:"Montserrat", system-ui, -apple-system, sans-serif;
   color-scheme:light;
-  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 :root[data-mode="dark"]{
   --sky1:#0c2547; --sky2:#071830; --sky3:#030b18; --bgmid:#0a1f3b; --ink:#cfe0f2;
@@ -39,13 +38,20 @@
   color-scheme:dark;
 }
 [hidden]{display:none!important}
-html{background:var(--sky2);overflow-x:hidden;overscroll-behavior:none}
-body{overflow-x:hidden;touch-action:pan-y pinch-zoom;overscroll-behavior:none}
-body{margin:0;min-height:100vh;font-family:var(--font);font-size:15px;line-height:1.45;color:var(--text);
-  background:linear-gradient(180deg,var(--sky1) 0%,var(--bgmid) 35%,var(--sky2) 70%,var(--sky3) 100%) fixed}
+html{background:var(--sky3);overflow:hidden;height:100%;overscroll-behavior:none}
+body{overflow:hidden;height:100%;overscroll-behavior:none}
+body{margin:0;min-height:100vh;font-family:var(--font);font-size:15px;line-height:1.45;color:var(--text);background:transparent}
+/* one background pinned to the whole screen, including behind the status bar and home bar */
+body::before{content:"";position:fixed;top:0;left:0;width:100vw;height:100lvh;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,var(--sky1) 0%,var(--bgmid) 35%,var(--sky2) 70%,var(--sky3) 100%)}
 #bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-.wrap{position:relative;z-index:1;max-width:620px;margin:0 auto;padding-block:10px 48px;
-  padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+ /* pages sit side by side; the phone itself handles the sideways swipe and snaps to a page */
+#pager{position:fixed;inset:0;z-index:1;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#pager::-webkit-scrollbar{display:none}
+.pane{flex:0 0 100%;width:100%;height:100%;overflow-y:auto;overflow-x:hidden;scroll-snap-align:start;scroll-snap-stop:always;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
+.pane[hidden]{display:none!important}
+.wrap{position:relative;z-index:1;max-width:620px;margin:0 auto;padding-top:calc(10px + env(safe-area-inset-top,0px));padding-bottom:calc(48px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px;box-sizing:border-box}
 button{font:inherit;cursor:pointer}
 :focus-visible{outline:3px solid var(--salmon);outline-offset:2px}
 
@@ -59,6 +65,16 @@ button{font:inherit;cursor:pointer}
 .seg{display:flex;background:var(--field);border:1px solid var(--fline);border-radius:999px;padding:3px}
 .seg button{flex:1;border:none;background:none;color:var(--sub);font-weight:600;padding:9px 12px;border-radius:999px}
 .seg button[aria-pressed="true"]{background:var(--teal);color:#fff}
+#floatSeg button{padding:9px 4px;font-size:.82rem}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:600;font-size:.92rem;cursor:pointer}
+.tog input{position:absolute;opacity:0;pointer-events:none}
+.tog i{flex:none;width:46px;height:28px;border-radius:999px;background:var(--fline);position:relative;transition:background .2s}
+.tog i::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.tog input:checked + i{background:var(--teal)}
+.tog input:checked + i::after{transform:translateX(18px)}
+.tog input:focus-visible + i{outline:3px solid var(--salmon);outline-offset:2px}
+.top-art.nofig{margin-bottom:0}
+.top-art.nofig .figure{display:none}
 .bar{display:flex;justify-content:flex-end;gap:8px}
 .pill{border:none;border-radius:999px;background:var(--card);color:var(--text);font-weight:600;font-size:.82rem;padding:8px 14px;box-shadow:0 4px 12px rgba(40,60,90,.18)}
 .brand{text-align:center;margin-top:-4px}
@@ -156,8 +172,6 @@ form select{background-color:var(--field)}
 
 /* Motion */
 @media (prefers-reduced-motion:no-preference){
-  .view.in-right{animation:inR .24s ease-out}
-  .view.in-left{animation:inL .24s ease-out}
 }
 @keyframes trace{to{stroke-dashoffset:0}}
 @keyframes inR{from{opacity:.35;transform:translateX(30%)}}
@@ -176,7 +190,8 @@ form select{background-color:var(--field)}
   </defs>
 </svg>
 
-<div class="wrap">
+<div id="pager">
+<section class="pane" id="listPane"><div class="wrap">
   <!-- Search -->
   <div id="listView" class="view">
     <div style="display:flex;flex-direction:column;gap:14px">
@@ -184,7 +199,14 @@ form select{background-color:var(--field)}
       <div class="card panel" id="settings" hidden>
         <div style="display:flex;flex-direction:column;gap:10px">
           <b>Appearance</b>
-          <div class="seg" role="group" aria-label="Appearance"><button type="button" data-mode="light">Light</button><button type="button" data-mode="dark">Dark</button></div>
+          <div class="seg" id="modeSeg" role="group" aria-label="Appearance"><button type="button" data-mode="light">Light</button><button type="button" data-mode="dark">Dark</button></div>
+          <b style="margin-top:6px">Background</b>
+          <label class="tog" for="fx-body"><span>Body with beating heart</span><input type="checkbox" id="fx-body"><i></i></label>
+          <label class="tog" for="fx-ekg"><span>Heartbeat line</span><input type="checkbox" id="fx-ekg"><i></i></label>
+          <label class="tog" for="fx-dna"><span>DNA helix</span><input type="checkbox" id="fx-dna"><i></i></label>
+          <span class="fine">Floating in the background</span>
+          <div class="seg" id="floatSeg" role="group" aria-label="Floating in the background"><button type="button" data-f="none">None</button><button type="button" data-f="specks">Specks</button><button type="button" data-f="molecules">Molecules</button><button type="button" data-f="color">Colorful</button></div>
+          <button class="btn2" id="fx-plain" type="button" style="align-self:flex-start">Plain background (turn all off)</button>
         </div>
       </div>
       <div class="top-art" id="topArt">
@@ -217,16 +239,20 @@ form select{background-color:var(--field)}
     </div>
   </div>
 
+</div></section>
+<section class="pane" id="cardPane" hidden><div class="wrap">
   <!-- Detail -->
-  <div id="cardView" class="view" hidden>
+  <div id="cardView" class="view">
     <div style="display:flex;flex-direction:column;gap:12px">
       <div class="topnav"><button class="back" id="back" type="button">‹ Back</button><button class="pill" id="editBtn" type="button">Edit</button></div>
       <div id="card"></div>
     </div>
   </div>
 
+</div></section>
+<section class="pane" id="editPane" hidden><div class="wrap">
   <!-- Edit -->
-  <div id="editView" class="view" hidden>
+  <div id="editView" class="view">
     <div style="display:flex;flex-direction:column;gap:12px">
       <div class="topnav"><button class="back" id="cancel" type="button">‹ Cancel</button></div>
       <div class="card panel">
@@ -247,6 +273,7 @@ form select{background-color:var(--field)}
       </div>
     </div>
   </div>
+</div></section>
 </div>
 <div class="toast" id="toast" hidden></div>
 
@@ -360,12 +387,13 @@ $("f-preg").add(new Option("Not set", ""));
 for (let i = 1; i <= 10; i++) $("f-preg").add(new Option(i + (i === 1 ? " (safest)" : i === 10 ? " (most dangerous)" : ""), i));
 
 // ---------- Views ----------
-let current = null, curName = null, scrollY = 0;
-function show(v) { ["listView", "cardView", "editView"].forEach(x => $(x).hidden = x !== v); }
+let current = null, curName = null, scrollY = 0, CUR = "listView";
+const PANE = { listView: "listPane", cardView: "cardPane", editView: "editPane" };
+function show(v) { CUR = v; arrange(); }
 const bullets = (title, arr) => `<div class="sec"><h3>${title}</h3>${arr.length ? `<ul>${arr.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<div class="none">Not filled in yet</div>`}</div>`;
 function openCard(id, name, prep) {
   const m = med(id); if (!m) return;
-  if (!$("listView").hidden) scrollY = window.scrollY;
+  if (CUR === "listView") scrollY = $("listPane").scrollTop;
   if (id !== current) curName = null;
   if (name !== undefined) curName = name || null;
   current = id;
@@ -392,14 +420,14 @@ function openCard(id, name, prep) {
     </div>
     <p class="fine">Personal reference only. Pregnancy scores are your own 1–10 scale, not an official FDA rating.</p>
   </div>`;
-  if (!prep) { show("cardView"); window.scrollTo(0, 0); }
+  if (!prep) { $("cardPane").scrollTop = 0; show("cardView"); }
 }
-$("back").onclick = () => history.back();
+$("back").onclick = () => slide(-1);
 
 // ---------- Edit ----------
 let editing = null, formSnap = "";
 const formState = () => [...$("form").elements].map(x => x.value).join("\u0001");
-const formDirty = () => !$("editView").hidden && formState() !== formSnap;
+const formDirty = () => CUR === "editView" && formState() !== formSnap;
 const lines = s => s.split("\n").map(x => x.replace(/^[-•*]\s*/, "").trim()).filter(Boolean);
 function openEdit(id, prep) {
   const m = id ? med(id) : { title: "", generic: "", variants: [], cats: [MISC], uses: [], off: [], sides: [], preg: null, pnote: "", notes: "", custom: true };
@@ -416,11 +444,12 @@ function openEdit(id, prep) {
   r.dataset.confirm = "";
   $("saveNote").textContent = "";
   formSnap = formState();
-  if (!prep) { show("editView"); window.scrollTo(0, 0); }
+  if (!prep) { $("editPane").scrollTop = 0; show("editView"); }
 }
 $("editBtn").onclick = () => go({ v: "edit", id: current });
-$("addBtn").onclick = () => { scrollY = window.scrollY; go({ v: "edit", id: null }); };
-$("cancel").onclick = () => history.back();
+$("addBtn").onclick = () => go({ v: "edit", id: null });
+$("cancel").onclick = () => slide(-1, true);
+$("form").addEventListener("input", () => { $("pager").style.overflowX = formDirty() ? "hidden" : ""; });
 $("form").addEventListener("submit", ev => {
   ev.preventDefault();
   const gen = $("f-gen").value.trim().toLowerCase();
@@ -440,7 +469,7 @@ $("form").addEventListener("submit", ev => {
   };
   try { saveEdits(); } catch (e) { $("saveNote").textContent = "Couldn't save. Your phone may be out of storage."; return; }
   ALL = allMeds(); toast("Saved");
-  if (editing) history.back();   // back to the card, which redraws with the new details
+  if (editing) { openCard(id, "", true); slide(-1, true); }   // back to the card, redrawn with the new details
   else { history.replaceState({ v: "card", id, i: navIdx }, ""); stack[navIdx] = { v: "card", id }; navMax = navIdx; openCard(id, ""); }
 });
 $("reset").onclick = () => {
@@ -451,102 +480,79 @@ $("reset").onclick = () => {
   try { saveEdits(); } catch (e) {}
   ALL = allMeds();
   toast(custom ? "Deleted" : "Changes undone");
-  if (custom) { editing = null; history.go(-2); } else history.back();
+  if (custom) { editing = null; jump(-2); } else { openCard(editing, "", true); slide(-1, true); }
 };
 let tt;
 function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 1800); }
 
-// ---------- Navigation: phone history and side-by-side swipe ----------
-let navIdx = 0, navMax = 0;
-const stack = [{ v: "list" }];   // the pages behind and ahead of the current one
-const viewOf = st => $(st.v === "card" ? "cardView" : st.v === "edit" ? "editView" : "listView");
-function go(st) { navIdx++; navMax = navIdx; stack.length = navIdx; stack[navIdx] = st; history.pushState({ ...st, i: navIdx }, ""); render(st, 1); }
-function paint(st, prep) {   // fill a page with its content; prep = don't show it yet
-  if (st.v === "card" && med(st.id)) { openCard(st.id, st.name, prep); return true; }
-  if (st.v === "edit" && (st.id === null || med(st.id))) { openEdit(st.id, prep); return true; }
-  if (!prep) { current = null; show("listView"); }
+// ---------- Navigation: pages side by side, swiped natively; phone history kept in step ----------
+let navIdx = 0, navMax = 0, pendingPush = false, ignorePop = false, quiet = false, settleT;
+const stack = [{ v: "list" }];
+const viewName = st => st.v === "card" ? "cardView" : st.v === "edit" ? "editView" : "listView";
+function paint(st) {   // fill a page with its content without moving to it
+  if (st.v === "card" && med(st.id)) return openCard(st.id, st.name, true), true;
+  if (st.v === "edit" && (st.id === null || med(st.id))) return openEdit(st.id, true), true;
   renderList(); return st.v === "list";
 }
-let skipAnim = false;
-function render(st, dir) {
-  if (!paint(st, false)) { current = null; show("listView"); renderList(); }
-  if (viewOf(st) === $("listView") || st.v === "list") window.scrollTo(0, scrollY);
-  const el = ["listView", "cardView", "editView"].map($).find(v => !v.hidden);
-  el.classList.remove("in-left", "in-right");
-  if (!skipAnim) { void el.offsetWidth; el.classList.add(dir > 0 ? "in-right" : "in-left"); }
-  skipAnim = false;
+function neighbors() {
+  const prev = navIdx > 0 ? stack[navIdx - 1] : null, next = navIdx < navMax ? stack[navIdx + 1] : null;
+  return { prev, next, pv: prev && viewName(prev), nv: next && viewName(next) };
 }
-let ignorePop = false;
-addEventListener("popstate", e => {
-  if (ignorePop) { ignorePop = false; return; }   // a swipe already switched the page
-  const st = e.state || { v: "list", i: 0 }, i = st.i || 0, dir = i < navIdx ? -1 : 1;
-  navIdx = i; if (!stack[i]) stack[i] = st; render(st, dir);
+function arrange() {   // previous page on the left, current in the middle, next on the right
+  const { pv, nv } = neighbors(), pager = $("pager");
+  for (const v of ["listView", "cardView", "editView"]) {
+    const pane = $(PANE[v]), was = pane.hidden;
+    pane.hidden = !(v === CUR || v === pv || v === nv);
+    if (v === "listView" && was && !pane.hidden) pane.scrollTop = scrollY;   // list comes back where you left it
+    pane.style.order = v === pv ? 0 : v === CUR ? 1 : 2;
+  }
+  quiet = true; pager.scrollLeft = $(PANE[CUR]).offsetLeft;
+  requestAnimationFrame(() => { pager.scrollLeft = $(PANE[CUR]).offsetLeft; quiet = false; });
+  pager.style.overflowX = formDirty() ? "hidden" : "";
+}
+function prepNeighbors() { const { prev, next } = neighbors(); if (prev) paint(prev); if (next) paint(next); }
+function commit(dir) {   // the swipe (or button) landed on the next or previous page
+  navIdx += dir; const st = stack[navIdx];
+  if (dir < 0) { ignorePop = true; history.back(); }
+  else if (pendingPush) { history.pushState({ ...st, i: navIdx }, ""); pendingPush = false; }
+  else { ignorePop = true; history.forward(); }
+  if (st.v === "list") current = null;
+  CUR = viewName(st); prepNeighbors(); arrange();
+}
+function slide(dir, force) {   // buttons: glide to the neighbor page, same as a swipe
+  const { pv, nv } = neighbors(), v = dir < 0 ? pv : nv; if (!v) return;
+  if (force) $("pager").style.overflowX = "";
+  $("pager").scrollTo({ left: $(PANE[v]).offsetLeft, behavior: "smooth" });
+}
+function go(st) {   // open a new page to the right and glide to it
+  stack.length = navIdx + 1; stack[navIdx + 1] = st; navMax = navIdx + 1; pendingPush = true;
+  paint(st); arrange(); requestAnimationFrame(() => requestAnimationFrame(() => slide(1)));
+}
+function jump(n) { navIdx += n; ignorePop = true; history.go(n); CUR = viewName(stack[navIdx]); if (CUR === "listView") current = null; prepNeighbors(); arrange(); }
+$("pager").addEventListener("scroll", () => {
+  if (quiet) return; clearTimeout(settleT);
+  settleT = setTimeout(() => {   // the swipe has come to rest: which page is showing?
+    const pager = $("pager"), x = pager.scrollLeft;
+    const shown = ["listView", "cardView", "editView"].map(v => $(PANE[v])).filter(p => !p.hidden).sort((a, b) => a.offsetLeft - b.offsetLeft);
+    const pane = shown.reduce((a, b) => Math.abs(b.offsetLeft - x) < Math.abs(a.offsetLeft - x) ? b : a);
+    const { pv, nv } = neighbors();
+    if (pv && pane === $(PANE[pv])) commit(-1); else if (nv && pane === $(PANE[nv])) commit(1);
+  }, 90);
+}, { passive: true });
+addEventListener("popstate", e => {   // Safari back/forward buttons or edge swipe
+  if (ignorePop) { ignorePop = false; return; }
+  const st = e.state || { v: "list", i: 0 }; navIdx = st.i || 0; if (!stack[navIdx]) stack[navIdx] = st;
+  pendingPush = false; paint(st); CUR = viewName(st); if (st.v === "list") current = null; prepNeighbors(); arrange();
 });
 history.replaceState({ v: "list", i: 0 }, "");
-(() => {   // swipe right = back, swipe left = forward; both pages slide together, sideways only
-  let sx = 0, sy = 0, t0 = 0, dx = 0, mode = -1, cur = null, tgt = null, back = true, can = false, W = 0;
-  const standalone = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
-  const clear = el => { if (!el) return; Object.assign(el.style, { transition: "", transform: "", position: "", left: "", right: "", top: "", boxShadow: "", zIndex: "" }); };
-  function placeTarget(st) {   // put the incoming page beside the current one, at its own scroll position
-    const wrap = document.querySelector(".wrap"), cs = getComputedStyle(wrap), tScroll = st.v === "list" ? scrollY : 0;
-    tgt.hidden = false;
-    Object.assign(tgt.style, { position: "absolute", left: cs.paddingLeft, right: cs.paddingRight, top: (parseFloat(cs.paddingTop) + window.scrollY - tScroll) + "px", zIndex: "2" });
-  }
-  addEventListener("touchstart", e => {
-    const t = e.touches[0]; mode = -1;
-    if (e.touches.length !== 1 || e.target.closest("input, textarea, select")) return;
-    if (!standalone && t.clientX < 24) return;   // Safari's own edge swipe
-    sx = t.clientX; sy = t.clientY; t0 = Date.now(); dx = 0; mode = 0; tgt = null;
-    cur = ["listView", "cardView", "editView"].map($).find(v => !v.hidden);
-  }, { passive: true });
-  addEventListener("touchmove", e => {
-    if (mode < 0) return;
-    const t = e.touches[0], mx = t.clientX - sx, my = t.clientY - sy;
-    if (mode === 0) {
-      if (Math.abs(mx) > 10 && Math.abs(mx) > Math.abs(my) * 1.2) {
-        mode = 1; back = mx > 0; W = document.documentElement.clientWidth;
-        const st = stack[back ? navIdx - 1 : navIdx + 1];
-        can = !!st && (back ? navIdx > 0 : navIdx < navMax) && !(back && formDirty());
-        if (back && formDirty()) toast("Tap Save or Cancel first");
-        if (can) {
-          paint(st, true); tgt = viewOf(st);
-          if (tgt === cur) { can = false; tgt = null; } else placeTarget(st);
-        }
-      } else { if (Math.abs(my) > 8) mode = -1; return; }
-    }
-    e.preventDefault();   // sideways swipe: no scrolling, no drifting
-    if (!can) return;     // nothing to go to: the page stays still
-    dx = back ? Math.max(0, Math.min(W, mx)) : Math.min(0, Math.max(-W, mx));
-    cur.style.transition = tgt.style.transition = "none";
-    cur.style.transform = `translateX(${dx}px)`;
-    tgt.style.transform = `translateX(${dx + (back ? -W : W)}px)`;
-    (back ? cur : tgt).style.boxShadow = "-8px 0 24px rgba(10,25,45,.25)";
-  }, { passive: false });
-  addEventListener("touchend", () => {
-    if (mode !== 1 || !can) { mode = -1; return; }
-    mode = -1;
-    const fast = Math.abs(dx) > 40 && Math.abs(dx) / Math.max(1, Date.now() - t0) > .45;
-    const commit = Math.abs(dx) > W * .3 || fast;
-    const a = cur, b = tgt, ease = "transform .26s cubic-bezier(.2,.8,.2,1)";
-    a.style.transition = b.style.transition = ease;
-    if (commit) {
-      a.style.transform = `translateX(${back ? W : -W}px)`; b.style.transform = "translateX(0)";
-      setTimeout(() => {
-        clear(a); clear(b); navIdx += back ? -1 : 1; skipAnim = true; render(stack[navIdx], back ? -1 : 1);
-        ignorePop = true; back ? history.back() : history.forward();
-      }, 260);
-    } else {
-      a.style.transform = "translateX(0)"; b.style.transform = `translateX(${back ? -W : W}px)`;
-      setTimeout(() => { clear(a); clear(b); b.hidden = true; }, 260);
-    }
-  });
-})();
+addEventListener("resize", () => arrange());
+arrange();
 
 // ---------- Settings: light / dark ----------
 function setMode(m) {
   if (m === "dark") document.documentElement.dataset.mode = "dark"; else delete document.documentElement.dataset.mode;
   try { localStorage.setItem("medifind-mode", m); } catch (e) {}
-  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === m));
+  document.querySelectorAll("#modeSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === m));
   document.querySelector('meta[name="theme-color"]').content = m === "dark" ? "#0c2547" : "#e9f0f7";
   dispatchEvent(new Event("modechange"));
 }
@@ -556,7 +562,21 @@ $("setBtn").onclick = () => {
   const open = $("settings").hidden; $("settings").hidden = !open; b.setAttribute("aria-expanded", open);
   if (open) $("bk").hidden = true;
 };
-document.querySelectorAll(".seg button").forEach(b => b.onclick = () => setMode(b.dataset.mode));
+document.querySelectorAll("#modeSeg button").forEach(b => b.onclick = () => setMode(b.dataset.mode));
+// background choices, remembered on this phone
+const FX = { body: true, ekg: true, dna: true, float: "molecules" };
+try { Object.assign(FX, JSON.parse(localStorage.getItem("medifind-fx")) || {}); } catch (e) {}
+function applyFX(save) {
+  $("fx-body").checked = FX.body; $("fx-ekg").checked = FX.ekg; $("fx-dna").checked = FX.dna;
+  document.querySelectorAll("#floatSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === FX.float));
+  $("topArt").classList.toggle("nofig", !FX.body && !FX.ekg);
+  if (save) try { localStorage.setItem("medifind-fx", JSON.stringify(FX)); } catch (e) {}
+  dispatchEvent(new Event("fxchange"));
+}
+["body", "ekg", "dna"].forEach(k => $("fx-" + k).onchange = e => { FX[k] = e.target.checked; applyFX(true); });
+document.querySelectorAll("#floatSeg button").forEach(b => b.onclick = () => { FX.float = b.dataset.f; applyFX(true); });
+$("fx-plain").onclick = () => { Object.assign(FX, { body: false, ekg: false, dna: false, float: "none" }); applyFX(true); };
+applyFX(false);
 
 // ---------- Backup ----------
 function bkInfo() { const n = Object.keys(edits).length; $("bkInfo").textContent = n ? n + (n === 1 ? " medicine edited or added" : " medicines edited or added") : "No edits yet"; }
@@ -596,6 +616,54 @@ $("imp").onchange = async e => {
     const gr = g.createRadialGradient(16, 16, 0, 16, 16, 16); gr.addColorStop(0, col); gr.addColorStop(1, "rgba(0,0,0,0)");
     g.fillStyle = gr; g.fillRect(0, 0, 32, 32); return (sprites[col] = c);
   }
+  // ---- tiny ball-and-stick molecules (real shapes and sizes; one color or standard atom colors) ----
+  const ATOM = { H: ["#ffffff", "#c9d1da", .25], C: ["#8a9099", "#3a3f46", .36], N: ["#7fa6ff", "#2f55c8", .35], O: ["#ff7b73", "#c42f2f", .34],
+                 S: ["#ffe266", "#c9a400", .48], Cl: ["#7be08a", "#25993a", .46], Na: ["#c99cff", "#7a3fd0", .52] };
+  const t3 = .63;
+  const MOLS = [
+    { a: [["O", 0, 0, 0], ["H", .76, .59, 0], ["H", -.76, .59, 0]], b: [[0, 1], [0, 2]] },                              // H2O
+    { a: [["C", 0, 0, 0], ["O", 1.16, 0, 0], ["O", -1.16, 0, 0]], b: [[0, 1, 2], [0, 2, 2]] },                          // CO2
+    { a: [["O", .6, 0, 0], ["O", -.6, 0, 0]], b: [[0, 1, 2]] },                                                          // O2
+    { a: [["N", .55, 0, 0], ["N", -.55, 0, 0]], b: [[0, 1, 3]] },                                                        // N2
+    { a: [["C", 0, 0, 0], ["H", t3, t3, t3], ["H", -t3, -t3, t3], ["H", -t3, t3, -t3], ["H", t3, -t3, -t3]], b: [[0, 1], [0, 2], [0, 3], [0, 4]] },   // CH4
+    { a: [["N", 0, 0, .12], ["H", .94, 0, -.3], ["H", -.47, .81, -.3], ["H", -.47, -.81, -.3]], b: [[0, 1], [0, 2], [0, 3]] },                       // NH3
+    { a: [["H", -.7, 0, 0], ["Cl", .64, 0, 0]], b: [[0, 1]] },                                                           // HCl
+    { a: [["Na", -1.15, 0, 0], ["Cl", 1.15, 0, 0]], b: [] },                                                             // NaCl (ionic, no bond stick)
+    { a: [["S", 0, 0, 0], ["O", 1.2, .62, 0], ["O", -1.2, .62, 0]], b: [[0, 1, 2], [0, 2, 2]] },                        // SO2
+    { a: [["C", .56, 0, 0], ["O", -.56, 0, 0]], b: [[0, 1, 3]] },                                                        // CO
+    { a: [["S", 0, 0, 0], ["H", .96, .7, 0], ["H", -.96, .7, 0]], b: [[0, 1], [0, 2]] },                                // H2S
+  ];
+  const atomSprites = {};
+  function atomSprite(dark, el, colorful) {   // shaded sphere: the page's own color, or the standard atom color
+    const key = colorful ? el : dark ? "d" : "l"; if (atomSprites[key]) return atomSprites[key];
+    const c = document.createElement("canvas"); c.width = c.height = 32; const g = c.getContext("2d");
+    const gr = g.createRadialGradient(11, 10, 2, 16, 16, 16);
+    gr.addColorStop(0, colorful ? ATOM[el][0] : dark ? "#e6f3ff" : "#9fb4c8"); gr.addColorStop(1, colorful ? ATOM[el][1] : dark ? "#6f93b8" : "#4c6580");
+    g.fillStyle = gr; g.beginPath(); g.arc(16, 16, 15.5, 0, 7); g.fill(); return (atomSprites[key] = c);
+  }
+  function newMol(x, y) {
+    return { x, y, m: MOLS[Math.floor(Math.random() * MOLS.length)], s: 5 + Math.random() * 5, a: .3 + Math.random() * .4,
+      vx: (Math.random() - .5) * .12, vy: -.05 - Math.random() * .12, ax: Math.random() * 6.28, ay: Math.random() * 6.28,
+      wx: (Math.random() - .5) * .012, wy: (Math.random() - .5) * .016 };
+  }
+  function drawMol(d, dark, colorful) {
+    const cx = Math.cos(d.ax), sx = Math.sin(d.ax), cy = Math.cos(d.ay), sy = Math.sin(d.ay);
+    const P = d.m.a.map(([el, x, y, z]) => { const x1 = x * cy + z * sy, z1 = -x * sy + z * cy, y2 = y * cx - z1 * sx, z2 = y * sx + z1 * cx;
+      const k = 1 + z2 * .12; return [el, d.x + x1 * d.s * k, d.y + y2 * d.s * k, z2, k]; });
+    ctx.globalAlpha = d.a * (dark ? .85 : .75);
+    ctx.strokeStyle = dark ? "rgba(190,215,240,.75)" : "rgba(70,90,110,.7)"; ctx.lineCap = "round";
+    for (const [i, j, n = 1] of d.m.b) {
+      const [, x1, y1] = P[i], [, x2, y2] = P[j];
+      if (n === 1) { ctx.lineWidth = d.s * .16; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); continue; }
+      const len = Math.hypot(x2 - x1, y2 - y1) || 1, ox = -(y2 - y1) / len * d.s * .13, oy = (x2 - x1) / len * d.s * .13;   // double/triple bonds
+      ctx.lineWidth = d.s * .1;
+      for (let q = 0; q < n; q++) { const f = q - (n - 1) / 2; ctx.beginPath(); ctx.moveTo(x1 + ox * f * 2, y1 + oy * f * 2); ctx.lineTo(x2 + ox * f * 2, y2 + oy * f * 2); ctx.stroke(); }
+    }
+    for (const [el, x, y, , k] of P.slice().sort((p, q) => p[3] - q[3])) {
+      const r = ATOM[el][2] * d.s * k * 1.6; ctx.drawImage(atomSprite(dark, el, colorful), x - r, y - r, r * 2, r * 2);
+    }
+    ctx.globalAlpha = 1;
+  }
   function drawDNA(t) {   // spins around its own axis: beads stay at their height and swing side to side, front side larger and brighter
     const mode = document.documentElement.dataset.mode === "dark" ? "dark" : "light", C = DNA_COL[mode];
     const cx = W - 30, AMP = 16, TURN = 240 / (2 * Math.PI), OFF = 2.3, ph = still ? 0 : (t / 12000) * 2 * Math.PI;   // one turn every 12 s
@@ -632,17 +700,25 @@ $("imp").onchange = async e => {
   function size() {
     dpr = Math.min(devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight;
     cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    dots = Array.from({ length: Math.round(W * H / 6200) }, () => ({ x: Math.random() * W, y: Math.random() * H, r: 1 + Math.random() * 1.8, vx: (Math.random() - .5) * .12, vy: -.05 - Math.random() * .12, a: .25 + Math.random() * .4 }));
+    dots = Array.from({ length: Math.round(W * H / 6200) }, () => newMol(Math.random() * W, Math.random() * H));
   }
   function frame(t) {
     ctx.clearRect(0, 0, W, H);
-    // dots
-    for (const d of dots) {
-      if (!still) { d.x += d.vx; d.y += d.vy; if (d.y < -5) { d.y = H + 5; d.x = Math.random() * W; } if (d.x < -5) d.x = W + 5; if (d.x > W + 5) d.x = -5; }
-      ctx.fillStyle = document.documentElement.dataset.mode === "dark" ? `rgba(150,195,240,${d.a * .8})` : `rgba(80,95,110,${d.a})`; ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, 7); ctx.fill();
+    // floating specks or molecules (Settings › Background)
+    const dark = document.documentElement.dataset.mode === "dark";
+    if (FX.float !== "none") for (const d of dots) {
+      if (!still) {
+        d.x += d.vx; d.y += d.vy; d.ax += d.wx; d.ay += d.wy;
+        if (d.y < -20) Object.assign(d, newMol(Math.random() * W, H + 20));
+        if (d.x < -20) d.x = W + 20; if (d.x > W + 20) d.x = -20;
+      }
+      if (FX.float === "specks") {
+        ctx.fillStyle = dark ? `rgba(150,195,240,${d.a * .8})` : `rgba(80,95,110,${d.a})`;
+        ctx.beginPath(); ctx.arc(d.x, d.y, .9 + (d.s - 5) * .36, 0, 7); ctx.fill();
+      } else drawMol(d, dark, FX.float === "color");
     }
     // DNA helix down the right edge, turning in place
-    drawDNA(t);
+    if (FX.dna) drawDNA(t);
     if (!still) requestAnimationFrame(frame);
   }
   size(); addEventListener("resize", size); addEventListener("modechange", () => { if (still) frame(0); }); requestAnimationFrame(frame);
@@ -720,6 +796,7 @@ $("imp").onchange = async e => {
   function draw(t) {
     dark = document.documentElement.dataset.mode === "dark"; C = dark ? CD : CL;
     ctx.clearRect(0, 0, W, H);
+    if (FX.body) {
     const X = P.map(([x, y], i) => [ox + (x + Math.sin(t / 1400 + ph[i]) * 1.2) * s, oy + (y + Math.cos(t / 1700 + ph[i]) * 1.2) * s]);
     ctx.fillStyle = C.tri;
     for (const [a, b, c] of T) { ctx.beginPath(); ctx.moveTo(...X[a]); ctx.lineTo(...X[b]); ctx.lineTo(...X[c]); ctx.fill(); }
@@ -741,6 +818,8 @@ $("imp").onchange = async e => {
       ctx.shadowColor = "rgba(255,40,40,.7)"; ctx.shadowBlur = 10 + 8 * pulse;
       ctx.drawImage(heartImg, fi * 180, 0, 180, 274, hx, hy, hw, hh); ctx.shadowBlur = 0;
     }
+    }
+    if (!FX.ekg) return;
     // heartbeat line through the chest
     const yE = oy + 124 * s;
     ctx.lineJoin = "round"; ctx.lineCap = "round";
@@ -754,6 +833,7 @@ $("imp").onchange = async e => {
   }
   function loop(t) { draw(t); requestAnimationFrame(loop); }
   layout(); addEventListener("resize", layout); addEventListener("modechange", () => { if (still) draw(0); });
+  addEventListener("fxchange", () => { if (FX.body || FX.ekg) { layout(); if (still) draw(0); } });
   if (still) heartImg.onload = () => draw(0); else requestAnimationFrame(loop);
 })();
 
