@@ -50,9 +50,9 @@ body::before{content:"";position:fixed;top:0;left:0;width:100vw;height:100lvh;z-
   background:linear-gradient(180deg,var(--sky1) 0%,var(--bgmid) 35%,var(--sky2) 70%,var(--sky3) 100%)}
 #bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
  /* pages sit side by side; the phone itself handles the sideways swipe and snaps to a page */
-#pager{position:fixed;inset:0;z-index:1;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#pager{position:fixed;inset:0;z-index:1;display:flex;overflow:hidden;overscroll-behavior:none}
 #pager::-webkit-scrollbar{display:none}
-.pane{flex:0 0 100%;width:100%;height:100%;overflow-y:auto;overflow-x:hidden;scroll-snap-align:start;scroll-snap-stop:always;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
+.pane{flex:0 0 100%;width:100%;height:100%;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y pinch-zoom}
 .pane[hidden]{display:none!important}
 .wrap{position:relative;z-index:1;max-width:620px;margin:0 auto;padding-top:calc(10px + env(safe-area-inset-top,0px));padding-bottom:calc(48px + env(safe-area-inset-bottom,0px));
   padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px;box-sizing:border-box}
@@ -452,8 +452,7 @@ function openEdit(id, prep) {
 }
 $("editBtn").onclick = () => go({ v: "edit", id: current });
 $("addBtn").onclick = () => go({ v: "edit", id: null });
-$("cancel").onclick = () => slide(-1, true);
-$("form").addEventListener("input", () => { $("pager").style.overflowX = formDirty() ? "hidden" : ""; });
+$("cancel").onclick = () => slide(-1);
 $("form").addEventListener("submit", ev => {
   ev.preventDefault();
   const gen = $("f-gen").value.trim().toLowerCase();
@@ -473,7 +472,7 @@ $("form").addEventListener("submit", ev => {
   };
   try { saveEdits(); } catch (e) { $("saveNote").textContent = "Couldn't save. Your phone may be out of storage."; return; }
   ALL = allMeds(); toast("Saved");
-  if (editing) { openCard(id, "", true); slide(-1, true); }   // back to the card, redrawn with the new details
+  if (editing) { openCard(id, "", true); slide(-1); }   // back to the card, redrawn with the new details
   else { history.replaceState({ v: "card", id, i: navIdx }, ""); stack[navIdx] = { v: "card", id }; navMax = navIdx; openCard(id, ""); }
 });
 $("reset").onclick = () => {
@@ -484,7 +483,7 @@ $("reset").onclick = () => {
   try { saveEdits(); } catch (e) {}
   ALL = allMeds();
   toast(custom ? "Deleted" : "Changes undone");
-  if (custom) { editing = null; jump(-2); } else { openCard(editing, "", true); slide(-1, true); }
+  if (custom) { editing = null; jump(-2); } else { openCard(editing, "", true); slide(-1); }
 };
 let tt;
 function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 1800); }
@@ -512,7 +511,6 @@ function arrange() {   // previous page on the left, current in the middle, next
   }
   quiet = true; pager.scrollLeft = $(PANE[CUR]).offsetLeft;
   requestAnimationFrame(() => { pager.scrollLeft = $(PANE[CUR]).offsetLeft; quiet = false; });
-  pager.style.overflowX = formDirty() ? "hidden" : "";
 }
 function prepNeighbors() { const { prev, next } = neighbors(); if (prev) paint(prev); if (next) paint(next); }
 function commit(dir) {   // the swipe (or button) landed on the next or previous page
@@ -523,26 +521,56 @@ function commit(dir) {   // the swipe (or button) landed on the next or previous
   if (st.v === "list") current = null;
   CUR = viewName(st); prepNeighbors(); arrange();
 }
-function slide(dir, force) {   // buttons: glide to the neighbor page, same as a swipe
+function glide(left, done, ms = 260) {   // smooth slide of the page strip
+  const pager = $("pager"), x0 = pager.scrollLeft, d = left - x0, t0 = performance.now();
+  quiet = true;
+  (function step(now) {
+    const p = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - p, 3);
+    pager.scrollLeft = x0 + d * e;
+    if (p < 1) requestAnimationFrame(step); else { quiet = false; done && done(); }
+  })(t0);
+}
+function slide(dir) {   // buttons: glide to the neighbor page, same as a swipe
   const { pv, nv } = neighbors(), v = dir < 0 ? pv : nv; if (!v) return;
-  if (force) $("pager").style.overflowX = "";
-  $("pager").scrollTo({ left: $(PANE[v]).offsetLeft, behavior: "smooth" });
+  glide($(PANE[v]).offsetLeft, () => commit(dir));
 }
 function go(st) {   // open a new page to the right and glide to it
   stack.length = navIdx + 1; stack[navIdx + 1] = st; navMax = navIdx + 1; pendingPush = true;
   paint(st); arrange(); requestAnimationFrame(() => requestAnimationFrame(() => slide(1)));
 }
 function jump(n) { navIdx += n; ignorePop = true; history.go(n); CUR = viewName(stack[navIdx]); if (CUR === "listView") current = null; prepNeighbors(); arrange(); }
-$("pager").addEventListener("scroll", () => {
-  if (quiet) return; clearTimeout(settleT);
-  settleT = setTimeout(() => {   // the swipe has come to rest: which page is showing?
-    const pager = $("pager"), x = pager.scrollLeft;
-    const shown = ["listView", "cardView", "editView"].map(v => $(PANE[v])).filter(p => !p.hidden).sort((a, b) => a.offsetLeft - b.offsetLeft);
-    const pane = shown.reduce((a, b) => Math.abs(b.offsetLeft - x) < Math.abs(a.offsetLeft - x) ? b : a);
-    const { pv, nv } = neighbors();
-    if (pv && pane === $(PANE[pv])) commit(-1); else if (nv && pane === $(PANE[nv])) commit(1);
-  }, 90);
-}, { passive: true });
+(() => {   // swipe right = back, swipe left = forward: both pages slide side by side under your finger
+  const pager = $("pager"), standalone = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
+  let sx = 0, sy = 0, t0 = 0, base = 0, mode = -1, dir = 0, lo = 0, hi = 0, dx = 0;
+  pager.addEventListener("touchstart", e => {
+    mode = -1; if (e.touches.length !== 1 || quiet) return;
+    const t = e.touches[0];
+    if (!standalone && t.clientX < 20) return;   // in Safari, the very edge belongs to Safari's own back swipe
+    sx = t.clientX; sy = t.clientY; t0 = Date.now(); base = pager.scrollLeft; dx = 0; mode = 0;
+  }, { passive: true });
+  pager.addEventListener("touchmove", e => {
+    if (mode < 0) return;
+    const t = e.touches[0], mx = t.clientX - sx, my = t.clientY - sy;
+    if (mode === 0) {
+      if (Math.abs(mx) < 8 || Math.abs(mx) < Math.abs(my)) { if (Math.abs(my) > 8) mode = -1; return; }   // up/down: the page scrolls
+      const { pv, nv } = neighbors(); dir = mx > 0 ? -1 : 1;
+      const target = dir < 0 ? pv : nv;
+      if (!target) { mode = -1; return; }                                     // nothing that way: stay still
+      if (dir < 0 && formDirty()) { toast("Tap Save or Cancel first"); mode = -1; return; }
+      const tl = $(PANE[target]).offsetLeft; lo = Math.min(base, tl); hi = Math.max(base, tl); mode = 1;
+    }
+    if (e.cancelable) e.preventDefault();
+    dx = mx; pager.scrollLeft = Math.max(lo, Math.min(hi, base - mx));
+  }, { passive: false });
+  const end = () => {
+    if (mode !== 1) { mode = -1; return; }
+    mode = -1;
+    const W = pager.clientWidth, moved = Math.abs(pager.scrollLeft - base), fast = moved > 40 && moved / Math.max(1, Date.now() - t0) > .45;
+    if (moved > W * .3 || fast) glide(dir < 0 ? lo : hi, () => commit(dir), 220);
+    else glide(base, null, 200);
+  };
+  pager.addEventListener("touchend", end); pager.addEventListener("touchcancel", end);
+})();
 addEventListener("popstate", e => {   // Safari back/forward buttons or edge swipe
   if (ignorePop) { ignorePop = false; return; }
   const st = e.state || { v: "list", i: 0 }; navIdx = st.i || 0; if (!stack[navIdx]) stack[navIdx] = st;
