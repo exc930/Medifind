@@ -39,8 +39,8 @@
   color-scheme:dark;
 }
 [hidden]{display:none!important}
-html{background:var(--sky2);overflow-x:hidden}
-body{overflow-x:hidden;touch-action:pan-y pinch-zoom;overscroll-behavior-x:none}
+html{background:var(--sky2);overflow-x:hidden;overscroll-behavior:none}
+body{overflow-x:hidden;touch-action:pan-y pinch-zoom;overscroll-behavior:none}
 body{margin:0;min-height:100vh;font-family:var(--font);font-size:15px;line-height:1.45;color:var(--text);
   background:linear-gradient(180deg,var(--sky1) 0%,var(--bgmid) 35%,var(--sky2) 70%,var(--sky3) 100%) fixed}
 #bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
@@ -363,7 +363,7 @@ for (let i = 1; i <= 10; i++) $("f-preg").add(new Option(i + (i === 1 ? " (safes
 let current = null, curName = null, scrollY = 0;
 function show(v) { ["listView", "cardView", "editView"].forEach(x => $(x).hidden = x !== v); }
 const bullets = (title, arr) => `<div class="sec"><h3>${title}</h3>${arr.length ? `<ul>${arr.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<div class="none">Not filled in yet</div>`}</div>`;
-function openCard(id, name) {
+function openCard(id, name, prep) {
   const m = med(id); if (!m) return;
   if (!$("listView").hidden) scrollY = window.scrollY;
   if (id !== current) curName = null;
@@ -392,7 +392,7 @@ function openCard(id, name) {
     </div>
     <p class="fine">Personal reference only. Pregnancy scores are your own 1–10 scale, not an official FDA rating.</p>
   </div>`;
-  show("cardView"); window.scrollTo(0, 0);
+  if (!prep) { show("cardView"); window.scrollTo(0, 0); }
 }
 $("back").onclick = () => history.back();
 
@@ -401,7 +401,7 @@ let editing = null, formSnap = "";
 const formState = () => [...$("form").elements].map(x => x.value).join("\u0001");
 const formDirty = () => !$("editView").hidden && formState() !== formSnap;
 const lines = s => s.split("\n").map(x => x.replace(/^[-•*]\s*/, "").trim()).filter(Boolean);
-function openEdit(id) {
+function openEdit(id, prep) {
   const m = id ? med(id) : { title: "", generic: "", variants: [], cats: [MISC], uses: [], off: [], sides: [], preg: null, pnote: "", notes: "", custom: true };
   editing = id;
   $("f-gen").value = m.generic; $("f-gen").readOnly = !!id && !m.custom;
@@ -415,8 +415,8 @@ function openEdit(id) {
   r.textContent = m.custom ? "Delete medicine" : "Undo my changes";
   r.dataset.confirm = "";
   $("saveNote").textContent = "";
-  show("editView"); window.scrollTo(0, 0);
   formSnap = formState();
+  if (!prep) { show("editView"); window.scrollTo(0, 0); }
 }
 $("editBtn").onclick = () => go({ v: "edit", id: current });
 $("addBtn").onclick = () => { scrollY = window.scrollY; go({ v: "edit", id: null }); };
@@ -441,7 +441,7 @@ $("form").addEventListener("submit", ev => {
   try { saveEdits(); } catch (e) { $("saveNote").textContent = "Couldn't save. Your phone may be out of storage."; return; }
   ALL = allMeds(); toast("Saved");
   if (editing) history.back();   // back to the card, which redraws with the new details
-  else { history.replaceState({ v: "card", id, i: navIdx }, ""); navMax = navIdx; openCard(id, ""); }
+  else { history.replaceState({ v: "card", id, i: navIdx }, ""); stack[navIdx] = { v: "card", id }; navMax = navIdx; openCard(id, ""); }
 });
 $("reset").onclick = () => {
   const r = $("reset");
@@ -456,61 +456,89 @@ $("reset").onclick = () => {
 let tt;
 function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 1800); }
 
-// ---------- Navigation: phone history and swipe gestures ----------
+// ---------- Navigation: phone history and side-by-side swipe ----------
 let navIdx = 0, navMax = 0;
-function go(st) { navIdx++; navMax = navIdx; history.pushState({ ...st, i: navIdx }, ""); render(st, 1); }
-function render(st, dir) {
-  if (st.v === "card" && med(st.id)) openCard(st.id, st.name);
-  else if (st.v === "edit" && (st.id === null || med(st.id))) openEdit(st.id);
-  else { current = null; show("listView"); renderList(); requestAnimationFrame(() => window.scrollTo(0, scrollY)); }
-  const el = ["listView", "cardView", "editView"].map($).find(v => !v.hidden);
-  el.classList.remove("in-left", "in-right"); void el.offsetWidth; el.classList.add(dir > 0 ? "in-right" : "in-left");
+const stack = [{ v: "list" }];   // the pages behind and ahead of the current one
+const viewOf = st => $(st.v === "card" ? "cardView" : st.v === "edit" ? "editView" : "listView");
+function go(st) { navIdx++; navMax = navIdx; stack.length = navIdx; stack[navIdx] = st; history.pushState({ ...st, i: navIdx }, ""); render(st, 1); }
+function paint(st, prep) {   // fill a page with its content; prep = don't show it yet
+  if (st.v === "card" && med(st.id)) { openCard(st.id, st.name, prep); return true; }
+  if (st.v === "edit" && (st.id === null || med(st.id))) { openEdit(st.id, prep); return true; }
+  if (!prep) { current = null; show("listView"); }
+  renderList(); return st.v === "list";
 }
+let skipAnim = false;
+function render(st, dir) {
+  if (!paint(st, false)) { current = null; show("listView"); renderList(); }
+  if (viewOf(st) === $("listView") || st.v === "list") window.scrollTo(0, scrollY);
+  const el = ["listView", "cardView", "editView"].map($).find(v => !v.hidden);
+  el.classList.remove("in-left", "in-right");
+  if (!skipAnim) { void el.offsetWidth; el.classList.add(dir > 0 ? "in-right" : "in-left"); }
+  skipAnim = false;
+}
+let ignorePop = false;
 addEventListener("popstate", e => {
+  if (ignorePop) { ignorePop = false; return; }   // a swipe already switched the page
   const st = e.state || { v: "list", i: 0 }, i = st.i || 0, dir = i < navIdx ? -1 : 1;
-  navIdx = i; render(st, dir);
+  navIdx = i; if (!stack[i]) stack[i] = st; render(st, dir);
 });
 history.replaceState({ v: "list", i: 0 }, "");
-(() => {   // swipe right = back, swipe left = forward; the page follows your finger
-  let sx = 0, sy = 0, t0 = 0, dx = 0, mode = -1, el = null;
+(() => {   // swipe right = back, swipe left = forward; both pages slide together, sideways only
+  let sx = 0, sy = 0, t0 = 0, dx = 0, mode = -1, cur = null, tgt = null, back = true, can = false, W = 0;
   const standalone = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
+  const clear = el => { if (!el) return; Object.assign(el.style, { transition: "", transform: "", position: "", left: "", right: "", top: "", boxShadow: "", zIndex: "" }); };
+  function placeTarget(st) {   // put the incoming page beside the current one, at its own scroll position
+    const wrap = document.querySelector(".wrap"), cs = getComputedStyle(wrap), tScroll = st.v === "list" ? scrollY : 0;
+    tgt.hidden = false;
+    Object.assign(tgt.style, { position: "absolute", left: cs.paddingLeft, right: cs.paddingRight, top: (parseFloat(cs.paddingTop) + window.scrollY - tScroll) + "px", zIndex: "2" });
+  }
   addEventListener("touchstart", e => {
     const t = e.touches[0]; mode = -1;
     if (e.touches.length !== 1 || e.target.closest("input, textarea, select")) return;
-    if (!standalone && t.clientX < 24) return;   // in Safari, the screen edge belongs to Safari's own back swipe
-    sx = t.clientX; sy = t.clientY; t0 = Date.now(); dx = 0; mode = 0;
-    el = ["listView", "cardView", "editView"].map($).find(v => !v.hidden);
+    if (!standalone && t.clientX < 24) return;   // Safari's own edge swipe
+    sx = t.clientX; sy = t.clientY; t0 = Date.now(); dx = 0; mode = 0; tgt = null;
+    cur = ["listView", "cardView", "editView"].map($).find(v => !v.hidden);
   }, { passive: true });
   addEventListener("touchmove", e => {
     if (mode < 0) return;
     const t = e.touches[0], mx = t.clientX - sx, my = t.clientY - sy;
     if (mode === 0) {
-      if (Math.abs(mx) > 10 && Math.abs(mx) > Math.abs(my) * 1.2) mode = 1;   // sideways: this is a swipe
-      else { if (Math.abs(my) > 8) mode = -1; return; }                        // up/down: normal scrolling
+      if (Math.abs(mx) > 10 && Math.abs(mx) > Math.abs(my) * 1.2) {
+        mode = 1; back = mx > 0; W = document.documentElement.clientWidth;
+        const st = stack[back ? navIdx - 1 : navIdx + 1];
+        can = !!st && (back ? navIdx > 0 : navIdx < navMax) && !(back && formDirty());
+        if (back && formDirty()) toast("Tap Save or Cancel first");
+        if (can) {
+          paint(st, true); tgt = viewOf(st);
+          if (tgt === cur) { can = false; tgt = null; } else placeTarget(st);
+        }
+      } else { if (Math.abs(my) > 8) mode = -1; return; }
     }
-    e.preventDefault();   // while swiping, the page can't scroll or drift
-    const can = mx > 0 ? navIdx > 0 : navIdx < navMax;
-    dx = can ? mx : mx * .15;
-    el.style.transition = "none"; el.style.transform = `translateX(${dx}px)`;
-    el.style.opacity = String(1 - Math.min(Math.abs(dx) / innerWidth, 1) * .4);
-    el.style.boxShadow = can ? `${dx > 0 ? -1 : 1}px 0 24px rgba(10,25,45,.25)` : "";
+    e.preventDefault();   // sideways swipe: no scrolling, no drifting
+    if (!can) return;     // nothing to go to: the page stays still
+    dx = back ? Math.max(0, Math.min(W, mx)) : Math.min(0, Math.max(-W, mx));
+    cur.style.transition = tgt.style.transition = "none";
+    cur.style.transform = `translateX(${dx}px)`;
+    tgt.style.transform = `translateX(${dx + (back ? -W : W)}px)`;
+    (back ? cur : tgt).style.boxShadow = "-8px 0 24px rgba(10,25,45,.25)";
   }, { passive: false });
   addEventListener("touchend", () => {
-    if (mode !== 1 || !el) { mode = -1; return; }
+    if (mode !== 1 || !can) { mode = -1; return; }
     mode = -1;
-    const back = dx > 0, can = back ? navIdx > 0 : navIdx < navMax;
-    const fast = Math.abs(dx) > 50 && Math.abs(dx) / Math.max(1, Date.now() - t0) > .5;
-    const commit = can && (Math.abs(dx) > innerWidth * .28 || fast);
-    if (commit && back && formDirty()) toast("Tap Save or Cancel first");
-    else if (commit) {
-      const v = el;
-      v.style.transition = "transform .17s ease-out, opacity .17s"; v.style.transform = `translateX(${back ? innerWidth : -innerWidth}px)`; v.style.opacity = "0";
-      setTimeout(() => { v.style.transition = v.style.transform = v.style.opacity = v.style.boxShadow = ""; back ? history.back() : history.forward(); }, 160);
-      return;
+    const fast = Math.abs(dx) > 40 && Math.abs(dx) / Math.max(1, Date.now() - t0) > .45;
+    const commit = Math.abs(dx) > W * .3 || fast;
+    const a = cur, b = tgt, ease = "transform .26s cubic-bezier(.2,.8,.2,1)";
+    a.style.transition = b.style.transition = ease;
+    if (commit) {
+      a.style.transform = `translateX(${back ? W : -W}px)`; b.style.transform = "translateX(0)";
+      setTimeout(() => {
+        clear(a); clear(b); navIdx += back ? -1 : 1; skipAnim = true; render(stack[navIdx], back ? -1 : 1);
+        ignorePop = true; back ? history.back() : history.forward();
+      }, 260);
+    } else {
+      a.style.transform = "translateX(0)"; b.style.transform = `translateX(${back ? -W : W}px)`;
+      setTimeout(() => { clear(a); clear(b); b.hidden = true; }, 260);
     }
-    const v = el;
-    v.style.transition = "transform .2s ease-out, opacity .2s"; v.style.transform = ""; v.style.opacity = ""; v.style.boxShadow = "";
-    setTimeout(() => { v.style.transition = ""; }, 220);
   });
 })();
 
