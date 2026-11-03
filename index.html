@@ -10,6 +10,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <title>Medifind</title>
+<script>try{if(localStorage.getItem("medifind-mode")==="dark")document.documentElement.dataset.mode="dark"}catch(e){}</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap">
 <style>
 /* NION medical theme: pale sky background with drifting dots and a DNA strand, dark rounded cards, teal icons, coral actions. */
@@ -20,14 +21,27 @@
   --teal:#2f7480; --teal2:#1c4c58; --teal-txt:#2a6e74;
   --coral:#c9472f; --salmon:#b53a2a;
   --low:#3fb57a; --mid:#e8b33a; --high:#ec7a3c; --top:#e04454;
+  --bgmid:#dfe9f3; --hero:rgba(242,246,250,.86); --fline:rgba(30,60,90,.14); --arrow:#5d6c79; --ph:#8b98a3;
+  --chipbg:rgba(47,116,128,.12); --none:#8a97a2; --fine:#7b8894; --meter:rgba(30,60,90,.1); --b2line:rgba(30,60,90,.2);
+  --shadow:rgba(40,60,90,.14); --logoglow:rgba(60,90,130,.35);
   --font:"Montserrat", system-ui, -apple-system, sans-serif;
   color-scheme:light;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
+:root[data-mode="dark"]{
+  --sky1:#0c2547; --sky2:#071830; --sky3:#030b18; --bgmid:#0a1f3b; --ink:#cfe0f2;
+  --card:rgba(18,38,66,.92); --card2:#e8f2ff; --field:#0e1f36; --line:rgba(120,180,255,.14);
+  --text:#e8f2ff; --sub:#9fb3c8; --teal:#2f8fa0; --teal2:#1b5f70; --teal-txt:#7fd6e0;
+  --coral:#ff5a4a; --salmon:#ff8a78;
+  --hero:rgba(18,38,66,.88); --fline:rgba(120,180,255,.2); --arrow:#9fb3c8; --ph:#6f849a;
+  --chipbg:rgba(80,200,220,.15); --none:#7d91a6; --fine:#8396ab; --meter:rgba(255,255,255,.1); --b2line:rgba(160,200,255,.3);
+  --shadow:rgba(0,0,0,.35); --logoglow:rgba(120,200,255,.5);
+  color-scheme:dark;
+}
 [hidden]{display:none!important}
 html{background:var(--sky2)}
 body{margin:0;min-height:100vh;font-family:var(--font);font-size:15px;line-height:1.45;color:var(--text);
-  background:linear-gradient(180deg,var(--sky1) 0%,#dfe9f3 35%,var(--sky2) 70%,var(--sky3) 100%) fixed}
+  background:linear-gradient(180deg,var(--sky1) 0%,var(--bgmid) 35%,var(--sky2) 70%,var(--sky3) 100%) fixed}
 #bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 .wrap{position:relative;z-index:1;max-width:620px;margin:0 auto;padding-block:10px 48px;
   padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
@@ -35,33 +49,37 @@ button{font:inherit;cursor:pointer}
 :focus-visible{outline:3px solid var(--salmon);outline-offset:2px}
 
 /* Top bar + logo */
+.cap{width:36px;height:36px;padding:0;display:grid;place-items:center}
+.cap svg{width:20px;height:20px;color:var(--text)}
+.cap.spin svg{animation:spin .6s ease-in-out}
+@keyframes spin{to{transform:rotate(360deg)}}
+.seg{display:flex;background:var(--field);border:1px solid var(--fline);border-radius:999px;padding:3px}
+.seg button{flex:1;border:none;background:none;color:var(--sub);font-weight:600;padding:9px 12px;border-radius:999px}
+.seg button[aria-pressed="true"]{background:var(--teal);color:#fff}
 .bar{display:flex;justify-content:flex-end;gap:8px}
 .pill{border:none;border-radius:999px;background:var(--card);color:var(--text);font-weight:600;font-size:.82rem;padding:8px 14px;box-shadow:0 4px 12px rgba(40,60,90,.18)}
 .brand{text-align:center;margin-top:-4px}
 .logo{position:relative;display:inline-block;font-weight:300;font-size:2.4rem;letter-spacing:.32em;margin-right:-.32em;color:#fff;
-  text-shadow:0 2px 10px rgba(60,90,130,.35)}
-.logo .cross{position:absolute;left:50%;top:52%;width:22px;height:22px;transform:translate(-50%,-50%);opacity:.75}
-.ecg{display:block;width:min(300px,80%);height:26px;margin:-4px auto 0;overflow:visible}
-.ecg .base{stroke:rgba(224,87,75,.35)}
-.ecg .pulse{stroke:var(--coral);stroke-dasharray:60 520;stroke-dashoffset:580;filter:drop-shadow(0 0 3px rgba(224,87,75,.8))}
+  text-shadow:0 2px 10px var(--logoglow)}
 
 /* Cards */
-.card{background:var(--card);border-radius:18px;box-shadow:0 8px 22px rgba(40,60,90,.14);border:1px solid var(--line)}
-.hero{position:relative;padding:18px 16px 16px 92px;margin-left:6px}
-.heart{position:absolute;left:-14px;top:50%;width:96px;transform:translateY(-55%);transform-origin:50% 60%;
-  filter:drop-shadow(0 0 10px rgba(230,60,60,.55)) drop-shadow(0 6px 8px rgba(80,0,0,.25))}
+.card{background:var(--card);border-radius:18px;box-shadow:0 8px 22px var(--shadow);border:1px solid var(--line)}
+.hero{position:relative;z-index:2;padding:18px 16px 16px;background:var(--hero);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.top-art{position:relative;border-radius:24px;margin-bottom:-58px;z-index:1}
+.figure{position:relative;height:250px}
+.figure canvas{position:absolute;inset:0;width:100%;height:100%;-webkit-mask-image:linear-gradient(to bottom,#000 72%,transparent 100%);mask-image:linear-gradient(to bottom,#000 72%,transparent 100%)}
 .hero h1{margin:0;font-size:1.25rem;font-weight:700}
 .hero p{margin:2px 0 12px;color:var(--sub);font-size:.85rem}
 input,select,textarea{font:inherit;font-size:16px;color:var(--text);background:var(--field);border:1px solid var(--line);border-radius:12px;padding:11px 14px;width:100%;box-sizing:border-box}
-input::placeholder,textarea::placeholder{color:#8b98a3}
-input,textarea,form select{border-color:rgba(30,60,90,.14)}
-select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,#5d6c79 50%),linear-gradient(135deg,#5d6c79 50%,transparent 50%);
+input::placeholder,textarea::placeholder{color:var(--ph)}
+input,textarea,form select{border-color:var(--fline)}
+select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--arrow) 50%),linear-gradient(135deg,var(--arrow) 50%,transparent 50%);
   background-position:calc(100% - 17px) 52%,calc(100% - 12px) 52%;background-size:5px 5px;background-repeat:no-repeat;padding-right:32px}
 .filters{display:flex;gap:8px}
 .filters select{flex:1;min-width:0;background-color:var(--card);border-radius:999px;font-size:14px;padding:9px 30px 9px 14px;box-shadow:0 4px 12px rgba(40,60,90,.15)}
 .sec-bar{display:flex;align-items:center;gap:10px}
 .sec-bar .lab{flex:1;background:var(--card);border-radius:999px;padding:6px 14px;font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
-.sec-bar .lab svg{width:12px;height:14px}
+.sec-bar .lab svg{width:12px;height:14px;color:var(--teal-txt)}
 .badge{background:var(--card);border-radius:999px;padding:5px 11px;font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums}
 
 /* List */
@@ -86,17 +104,17 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
 .dhead h2{margin:0;font-size:1.45rem;line-height:1.15;font-weight:700}
 .gen{color:var(--sub);font-style:italic;font-size:.9rem}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{background:rgba(47,116,128,.12);color:var(--teal-txt);border-radius:999px;padding:4px 11px;font-size:.75rem;font-weight:600}
+.chip{background:var(--chipbg);color:var(--teal-txt);border-radius:999px;padding:4px 11px;font-size:.75rem;font-weight:600}
 .sec h3{margin:0 0 6px;font-size:.68rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--salmon)}
 .sec ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
 .sec li{position:relative;padding-left:18px}
 .sec li::before{content:"";position:absolute;left:2px;top:.55em;width:7px;height:7px;border-radius:50%;background:var(--teal-txt)}
-.none{color:#8a97a2;font-size:.88rem}
+.none{color:var(--none);font-size:.88rem}
 .meter{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:8px 0}
-.meter span{height:10px;border-radius:4px;background:rgba(30,60,90,.1)}
+.meter span{height:10px;border-radius:4px;background:var(--meter)}
 .pscore{display:flex;align-items:baseline;gap:10px}
 .pscore strong{font-size:1.7rem;font-weight:700}
-.fine{color:#7b8894;font-size:.75rem;margin:0}
+.fine{color:var(--fine);font-size:.75rem;margin:0}
 
 /* Forms */
 .panel{padding:18px}
@@ -107,17 +125,14 @@ textarea{min-height:84px;resize:vertical}
 form select{background-color:var(--field)}
 .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .btn{border:none;border-radius:999px;background:var(--coral);color:#fff;font-weight:700;padding:11px 20px;box-shadow:0 4px 14px rgba(201,71,47,.4)}
-.btn2{border:1px solid rgba(30,60,90,.2);border-radius:999px;background:transparent;color:var(--text);font-weight:600;padding:10px 18px;font-size:.9rem}
+.btn2{border:1px solid var(--b2line);border-radius:999px;background:transparent;color:var(--text);font-weight:600;padding:10px 18px;font-size:.9rem}
 .danger{color:var(--salmon)}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--card2);color:#fff;padding:10px 20px;border-radius:999px;font-weight:600;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--card2);color:var(--sky2);padding:10px 20px;border-radius:999px;font-weight:600;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 
 /* Motion */
 @media (prefers-reduced-motion:no-preference){
-  .heart{animation:beat 1.2s ease-in-out infinite}
-  .ecg .pulse{animation:trace 2.4s linear infinite}
   .view{animation:rise .25s ease-out}
 }
-@keyframes beat{0%,100%{transform:translateY(-55%) scale(1)}12%{transform:translateY(-55%) scale(1.08)}24%{transform:translateY(-55%) scale(.99)}36%{transform:translateY(-55%) scale(1.05)}55%{transform:translateY(-55%) scale(1)}}
 @keyframes trace{to{stroke-dashoffset:0}}
 @keyframes rise{from{opacity:.4;transform:translateY(6px)}}
 </style>
@@ -128,7 +143,7 @@ form select{background-color:var(--field)}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="pill" viewBox="0 0 24 24"><g fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><rect x="2.5" y="8" width="19" height="8" rx="4" transform="rotate(-40 12 12)"/><path d="M9.1 8.5l5.8 7" /></g></symbol>
-    <symbol id="dna" viewBox="0 0 12 14"><g fill="none" stroke="#2a6e74" stroke-width="1.4" stroke-linecap="round"><path d="M2 1c0 4 8 4 8 6s-8 2-8 6"/><path d="M10 1c0 4-8 4-8 6s8 2 8 6"/></g></symbol>
+    <symbol id="dna" viewBox="0 0 12 14"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 1c0 4 8 4 8 6s-8 2-8 6"/><path d="M10 1c0 4-8 4-8 6s8 2 8 6"/></g></symbol>
   </defs>
 </svg>
 
@@ -136,53 +151,23 @@ form select{background-color:var(--field)}
   <!-- Search -->
   <div id="listView" class="view">
     <div style="display:flex;flex-direction:column;gap:14px">
-      <div class="bar"><button class="pill" id="bkBtn" type="button">Backup</button><button class="pill" id="addBtn" type="button">+ Add</button></div>
-      <div class="brand">
-        <div class="logo">MEDIFIND<svg class="cross" viewBox="0 0 20 20"><path d="M7 1h6v6h6v6h-6v6H7v-6H1V7h6z" fill="#e0574b" opacity=".85"/></svg></div>
-        <svg class="ecg" viewBox="0 0 300 26" fill="none" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
-          <path class="base" d="M0 16h110l6-4 5 4h8l4 6 7-21 7 26 5-11h10l7-5 7 5h134"/>
-          <path class="pulse" pathLength="580" d="M0 16h110l6-4 5 4h8l4 6 7-21 7 26 5-11h10l7-5 7 5h134"/>
-        </svg>
+      <div class="bar"><button class="pill" id="bkBtn" type="button">Backup</button><button class="pill" id="addBtn" type="button">+ Add</button><button class="pill cap" id="setBtn" type="button" aria-label="Settings" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2.5" y="8" width="19" height="8" rx="4" transform="rotate(-40 12 12)"/><path d="M9.1 8.5l5.8 7"/></svg></button></div>
+      <div class="card panel" id="settings" hidden>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <b>Appearance</b>
+          <div class="seg" role="group" aria-label="Appearance"><button type="button" data-mode="light">Light</button><button type="button" data-mode="dark">Dark</button></div>
+        </div>
+      </div>
+      <div class="top-art" id="topArt">
+        <div class="brand">
+          <div class="logo">MEDIFIND</div>
+        </div>
+        <div class="figure" id="figure" aria-hidden="true">
+          <canvas id="torso"></canvas>
+        </div>
       </div>
 
       <div class="card hero">
-        <svg class="heart" viewBox="0 0 120 150" aria-hidden="true">
-          <defs>
-            <radialGradient id="hBody" cx="38%" cy="38%" r="70%"><stop offset="0" stop-color="#f26a5c"/><stop offset=".45" stop-color="#c8302f"/><stop offset=".85" stop-color="#7c1518"/><stop offset="1" stop-color="#5a0d10"/></radialGradient>
-            <radialGradient id="hAtr" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#d9504a"/><stop offset="1" stop-color="#7a1a1d"/></radialGradient>
-            <linearGradient id="hAorta" x1="0" x2="1"><stop offset="0" stop-color="#b52a2b"/><stop offset=".5" stop-color="#ee6a5d"/><stop offset="1" stop-color="#9c1f22"/></linearGradient>
-            <linearGradient id="hVein" gradientUnits="userSpaceOnUse" x1="27" x2="39" y1="0" y2="0"><stop offset="0" stop-color="#3b4f9e"/><stop offset=".5" stop-color="#7189dc"/><stop offset="1" stop-color="#34478f"/></linearGradient>
-            <linearGradient id="hPulm" x1="0" x2="1"><stop offset="0" stop-color="#5a4fa8"/><stop offset=".5" stop-color="#8f86e0"/><stop offset="1" stop-color="#4b4196"/></linearGradient>
-            <radialGradient id="hShine" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-          </defs>
-          <g fill="none" stroke-linecap="round">
-            <!-- superior vena cava -->
-            <path d="M33 62V8" stroke="url(#hVein)" stroke-width="12"/>
-            <!-- right pulmonary artery (behind aorta) -->
-            <path d="M76 44C66 40 56 40 46 43" stroke="url(#hPulm)" stroke-width="7"/>
-            <!-- aortic branches + arch -->
-            <path d="M63 19L61 4M74 15V2M84 17l4-11" stroke="url(#hAorta)" stroke-width="5"/>
-            <path d="M56 64C54 36 58 18 74 16S94 26 92 46" stroke="url(#hAorta)" stroke-width="14"/>
-            <path d="M60 30C62 22 68 19 74 19" stroke="#fff" stroke-opacity=".3" stroke-width="3"/>
-            <!-- pulmonary trunk + left branch -->
-            <path d="M66 70C68 56 72 47 79 42M79 42C87 38 95 38 101 43" stroke="url(#hPulm)" stroke-width="11"/>
-          </g>
-          <!-- right atrium -->
-          <ellipse cx="30" cy="76" rx="16" ry="18" fill="url(#hAtr)"/>
-          <!-- ventricles -->
-          <path d="M28 70C16 84 18 108 34 124c14 14 36 24 52 20 14-6 22-26 20-48-2-20-12-34-28-36-16-2-38 0-50 10z" fill="url(#hBody)"/>
-          <!-- left auricle -->
-          <path d="M92 62c8-4 16 0 16 8-5-2-10 0-14 4z" fill="#9f2226"/>
-          <g fill="none" stroke-linecap="round">
-            <!-- coronary grooves with fat, arteries (red) and veins (blue) -->
-            <path d="M74 62C70 84 72 112 84 140M40 66C35 82 34 98 44 118" stroke="#eac27c" stroke-opacity=".22" stroke-width="5"/>
-            <path d="M77 62C74 84 76 112 87 138" stroke="#5a6fc7" stroke-width="1.4"/>
-            <path d="M74 62C70 84 72 112 84 140M40 66C35 82 34 98 44 118" stroke="#ff7b66" stroke-width="1.5"/>
-            <path d="M72 86C80 88 90 94 96 104M72 104C80 108 86 116 90 124M38 90C46 96 52 104 54 114M73 74C82 74 92 78 100 86" stroke="#ff7b66" stroke-width="1.1" opacity=".85"/>
-          </g>
-          <!-- shine -->
-          <ellipse cx="48" cy="94" rx="14" ry="21" fill="url(#hShine)" transform="rotate(-18 48 94)"/>
-        </svg>
         <h1>Find a medicine</h1>
         <p id="sub">Search by brand or generic name</p>
         <input id="q" type="search" placeholder="e.g. Topamax or topiramate" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search medicines">
@@ -396,9 +381,25 @@ $("reset").onclick = () => {
 let tt;
 function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 1800); }
 
+// ---------- Settings: light / dark ----------
+function setMode(m) {
+  if (m === "dark") document.documentElement.dataset.mode = "dark"; else delete document.documentElement.dataset.mode;
+  try { localStorage.setItem("medifind-mode", m); } catch (e) {}
+  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === m));
+  document.querySelector('meta[name="theme-color"]').content = m === "dark" ? "#0c2547" : "#e9f0f7";
+  dispatchEvent(new Event("modechange"));
+}
+setMode(document.documentElement.dataset.mode === "dark" ? "dark" : "light");
+$("setBtn").onclick = () => {
+  const b = $("setBtn"); b.classList.remove("spin"); void b.offsetWidth; b.classList.add("spin");
+  const open = $("settings").hidden; $("settings").hidden = !open; b.setAttribute("aria-expanded", open);
+  if (open) $("bk").hidden = true;
+};
+document.querySelectorAll(".seg button").forEach(b => b.onclick = () => setMode(b.dataset.mode));
+
 // ---------- Backup ----------
 function bkInfo() { const n = Object.keys(edits).length; $("bkInfo").textContent = n ? n + (n === 1 ? " medicine edited or added" : " medicines edited or added") : "No edits yet"; }
-$("bkBtn").onclick = () => { $("bk").hidden = !$("bk").hidden; bkInfo(); };
+$("bkBtn").onclick = () => { $("bk").hidden = !$("bk").hidden; $("settings").hidden = true; bkInfo(); };
 $("exp").onclick = async () => {
   const name = "medifind-backup-" + new Date().toISOString().slice(0, 10) + ".json";
   const file = new File([JSON.stringify(edits, null, 1)], name, { type: "application/json" });
@@ -426,21 +427,12 @@ $("imp").onchange = async e => {
     cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     dots = Array.from({ length: Math.round(W * H / 9000) }, () => ({ x: Math.random() * W, y: Math.random() * H, r: 1 + Math.random() * 1.8, vx: (Math.random() - .5) * .12, vy: -.05 - Math.random() * .12, a: .25 + Math.random() * .4 }));
   }
-  function hex(x, y, r) { ctx.beginPath(); for (let i = 0; i < 6; i++) { const t = Math.PI / 3 * i + Math.PI / 6; ctx.lineTo(x + r * Math.cos(t), y + r * Math.sin(t)); } ctx.closePath(); ctx.stroke(); }
   function frame(t) {
     ctx.clearRect(0, 0, W, H);
-    // faint line art
-    ctx.strokeStyle = "rgba(70,140,140,.13)"; ctx.lineWidth = 2;
-    hex(W * .5, 150, 26); hex(W * .5 + 45, 176, 26); hex(W * .5 - 45, 176, 26);
-    ctx.lineWidth = 10; ctx.strokeStyle = "rgba(70,140,140,.07)";
-    ctx.beginPath(); ctx.arc(-40, 140, 140, -.4, 1.2); ctx.stroke();
-    ctx.beginPath(); ctx.arc(-40, 140, 190, -.3, 1.1); ctx.stroke();
-    ctx.setLineDash([6, 10]); ctx.lineWidth = 3; ctx.strokeStyle = "rgba(70,90,110,.12)";
-    ctx.beginPath(); ctx.moveTo(26, 0); ctx.lineTo(26, H); ctx.stroke(); ctx.setLineDash([]);
     // dots
     for (const d of dots) {
       if (!still) { d.x += d.vx; d.y += d.vy; if (d.y < -5) { d.y = H + 5; d.x = Math.random() * W; } if (d.x < -5) d.x = W + 5; if (d.x > W + 5) d.x = -5; }
-      ctx.fillStyle = `rgba(80,95,110,${d.a})`; ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, 7); ctx.fill();
+      ctx.fillStyle = document.documentElement.dataset.mode === "dark" ? `rgba(150,195,240,${d.a * .8})` : `rgba(80,95,110,${d.a})`; ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, 7); ctx.fill();
     }
     // DNA helix on the right edge
     const cx = W - 22, amp = 13, ph = still ? 0 : t / 900, top = 170, len = Math.min(330, H - 220);
@@ -455,7 +447,107 @@ $("imp").onchange = async e => {
     }
     if (!still) requestAnimationFrame(frame);
   }
-  size(); addEventListener("resize", size); requestAnimationFrame(frame);
+  size(); addEventListener("resize", size); addEventListener("modechange", () => { if (still) frame(0); }); requestAnimationFrame(frame);
+})();
+
+// ---------- Wireframe torso, beating heart and heartbeat line ----------
+(() => {
+  const fig = $("figure"), cv = $("torso"), ctx = cv.getContext("2d");
+  let dark = false;
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const heartImg = new Image(); heartImg.src = "heart.png";   // 7 frames, 180 x 274 each
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  // Body shape in a 300 x 250 box: outer contour (left side, mirrored) plus arm and torso-side lines
+  const outer = [[124,0],[123,22],[112,36],[88,46],[62,54],[44,66],[34,86],[30,112],[28,150],[26,195],[24,250]];
+  const armIn = [[56,104],[56,150],[55,200],[54,250]];
+  const side  = [[74,106],[78,150],[81,200],[83,250]];
+  const neckline = [[123,22],[134,32],[150,36],[166,32],[177,22]];
+  const mir = l => l.map(([x, y]) => [300 - x, y]);
+  const P = [], E = [], seen = new Set();
+  const link = (a, b) => { const k = a < b ? a + "-" + b : b + "-" + a; if (a !== b && !seen.has(k)) { seen.add(k); E.push([a, b]); } };
+  function contour(line, step, jit) {          // points along a line, joined in order
+    let prev = -1;
+    for (let i = 0; i < line.length - 1; i++) {
+      const [x1, y1] = line[i], [x2, y2] = line[i + 1], n = Math.max(1, Math.round(Math.hypot(x2 - x1, y2 - y1) / step));
+      for (let k = 0; k < n; k++) { const t = k / n; P.push([x1 + (x2 - x1) * t + (rnd() - .5) * jit, y1 + (y2 - y1) * t + (rnd() - .5) * jit]); if (prev >= 0) link(prev, P.length - 1); prev = P.length - 1; }
+    }
+    P.push(line[line.length - 1].slice()); link(prev, P.length - 1);
+  }
+  [outer, mir(outer)].forEach(l => contour(l, 9, 3));
+  [armIn, mir(armIn), side, mir(side)].forEach(l => contour(l, 12, 5));
+  contour(neckline, 8, 2);
+  // inner points: the shoulders and arms are dense, the chest is sparse so the heart stands out
+  const region = (x, y) => {
+    const xl = Math.min(x, 300 - x);
+    const ox = y < 22 ? 124 : y < 46 ? 124 - (y - 22) * 1.5 : y < 66 ? 88 - (y - 46) * 2.2 : y < 112 ? 44 - (y - 66) * .3 : 30 - (y - 112) * .04;
+    if (xl < ox) return 0;
+    if (y > 104 && xl > 56 && xl < 74) return 0;          // gap between arm and body
+    return xl < 74 && y > 104 ? 2 : (y < 70 ? 2 : 1);
+  };
+  for (let tries = 0; P.length < 260 && tries < 6000; tries++) {
+    const x = 24 + rnd() * 252, y = 2 + rnd() * 246, r = region(x, y);
+    if (!r) continue;
+    const xl = Math.min(x, 300 - x), chest = xl > 95 && y > 70;
+    if (r === 2 || (!chest && rnd() < .7) || rnd() < .16) P.push([x, y]);
+  }
+  P.forEach((p, i) => P.map((q, j) => [Math.hypot(p[0] - q[0], p[1] - q[1]), j]).filter(([d, j]) => j !== i && d < 30).sort((a, b) => a[0] - b[0]).slice(0, 3).forEach(([, j]) => link(i, j)));
+  const T = [];
+  E.forEach(([a, b]) => { for (const [c, d] of E) { const o = c === a ? d : d === a ? c : -1; if (o >= 0 && o !== b && seen.has(b < o ? b + "-" + o : o + "-" + b) && rnd() < .35) T.push([a, b, o]); } });
+  const ph = P.map(() => rnd() * 6.28);
+  const CD = { tri: "rgba(70,150,255,.08)", line: "rgba(90,190,255,.5)", dot: "#eaf8ff", glow: "rgba(80,190,255,.9)", ecg: "rgba(255,70,80,.55)", hot: "#ff4d5a" }, CL = { tri: "rgba(40,130,180,.07)", line: "rgba(30,115,160,.38)", dot: "#1f86b3", glow: "rgba(31,134,179,.5)", ecg: "rgba(201,71,47,.4)", hot: "#d23b2b" };
+  let C = CL;
+  const spike = [[0,0],[8,-5],[13,0],[19,0],[23,6],[29,-34],[36,28],[41,-9],[47,0],[56,-7],[63,0]];
+  let W, H, s, ox, oy, dpr;
+  function layout() {
+    W = fig.clientWidth; s = Math.min(W * .96, 360) / 300; ox = (W - 300 * s) / 2; oy = 4;
+    H = Math.round(oy + 232 * s); fig.style.height = H + "px";
+    dpr = Math.min(devicePixelRatio || 1, 2); cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (still) draw(0);
+  }
+  function ecgPath(yE) {
+    ctx.beginPath(); ctx.moveTo(0, yE);
+    const k = s * .85;
+    for (const x0 of [W * .04, W * .81]) for (const [dx, dy] of spike) ctx.lineTo(x0 + dx * k, yE + dy * k);
+    ctx.lineTo(W, yE);
+  }
+  function draw(t) {
+    dark = document.documentElement.dataset.mode === "dark"; C = dark ? CD : CL;
+    ctx.clearRect(0, 0, W, H);
+    const X = P.map(([x, y], i) => [ox + (x + Math.sin(t / 1400 + ph[i]) * 1.2) * s, oy + (y + Math.cos(t / 1700 + ph[i]) * 1.2) * s]);
+    ctx.fillStyle = C.tri;
+    for (const [a, b, c] of T) { ctx.beginPath(); ctx.moveTo(...X[a]); ctx.lineTo(...X[b]); ctx.lineTo(...X[c]); ctx.fill(); }
+    ctx.strokeStyle = C.line; ctx.lineWidth = .8; ctx.beginPath();
+    for (const [a, b] of E) { ctx.moveTo(...X[a]); ctx.lineTo(...X[b]); }
+    ctx.stroke();
+    ctx.shadowColor = C.glow; ctx.shadowBlur = dark ? 6 : 3; ctx.fillStyle = C.dot;
+    X.forEach(([x, y], i) => { ctx.globalAlpha = .5 + .5 * Math.sin(t / 650 + ph[i] * 3) ** 2; ctx.beginPath(); ctx.arc(x, y, 1.5, 0, 7); ctx.fill(); });
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    // heart: glow pulse, then the current frame of the beat (0.7 s per beat, 7 frames)
+    const beat = (t % 700) / 700, fi = Math.floor(beat * 7);
+    const hw = 58 * s, hh = hw * 274 / 180, hx = ox + 158 * s - hw / 2, hy = oy + 112 * s - hh / 2;
+    const pulse = beat < .3 ? beat / .3 : 1 - (beat - .3) / .7;
+    const gr = hw * (1.1 + .25 * pulse), gx = hx + hw / 2, gy = hy + hh * .55;
+    const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, gr);
+    g.addColorStop(0, `rgba(240,50,60,${.35 + .3 * pulse})`); g.addColorStop(1, "rgba(240,50,60,0)");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(gx, gy, gr, 0, 7); ctx.fill();
+    if (heartImg.complete && heartImg.naturalWidth) {
+      ctx.shadowColor = "rgba(255,40,40,.7)"; ctx.shadowBlur = 10 + 8 * pulse;
+      ctx.drawImage(heartImg, fi * 180, 0, 180, 274, hx, hy, hw, hh); ctx.shadowBlur = 0;
+    }
+    // heartbeat line through the chest
+    const yE = oy + 124 * s;
+    ctx.lineJoin = "round"; ctx.lineCap = "round";
+    ctx.setLineDash(dark ? [3, 3] : []); ctx.strokeStyle = C.ecg; ctx.lineWidth = 1.5; ecgPath(yE); ctx.stroke(); ctx.setLineDash([]);
+    if (t) {
+      const head = ((t % 2400) / 2400) * (W + 120) - 60;
+      ctx.save(); ctx.beginPath(); ctx.rect(head - 90, 0, 90, H); ctx.clip();
+      const lg = ctx.createLinearGradient(head - 90, 0, head, 0); lg.addColorStop(0, "rgba(255,80,80,0)"); lg.addColorStop(1, C.hot);
+      ctx.strokeStyle = lg; ctx.lineWidth = 2.2; ctx.shadowColor = C.hot; ctx.shadowBlur = 8; ecgPath(yE); ctx.stroke(); ctx.restore();
+    }
+  }
+  function loop(t) { draw(t); requestAnimationFrame(loop); }
+  layout(); addEventListener("resize", layout); addEventListener("modechange", () => { if (still) draw(0); });
+  if (still) heartImg.onload = () => draw(0); else requestAnimationFrame(loop);
 })();
 
 renderList();
