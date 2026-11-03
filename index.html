@@ -7,6 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Medifind">
 <meta name="theme-color" content="#e9f0f7">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <title>Medifind</title>
@@ -23,7 +24,7 @@
   --low:#3fb57a; --mid:#e8b33a; --high:#ec7a3c; --top:#e04454;
   --bgmid:#dfe9f3; --hero:rgba(242,246,250,.86); --fline:rgba(30,60,90,.14); --arrow:#5d6c79; --ph:#8b98a3;
   --chipbg:rgba(47,116,128,.12); --none:#8a97a2; --fine:#7b8894; --meter:rgba(30,60,90,.1); --b2line:rgba(30,60,90,.2);
-  --shadow:rgba(40,60,90,.14); --logoglow:rgba(255,255,255,.7); --logo:#1f3346;
+  --shadow:rgba(40,60,90,.14); --logoglow:rgba(255,255,255,.7); --logo:#1f3346; --scrim:.38;
   --font:"Montserrat", system-ui, -apple-system, sans-serif;
   color-scheme:light;
 }
@@ -34,13 +35,16 @@
   --coral:#ff5a4a; --salmon:#ff8a78;
   --hero:rgba(18,38,66,.88); --fline:rgba(120,180,255,.2); --arrow:#9fb3c8; --ph:#6f849a;
   --chipbg:rgba(80,200,220,.15); --none:#7d91a6; --fine:#8396ab; --meter:rgba(255,255,255,.1); --b2line:rgba(160,200,255,.3);
-  --shadow:rgba(0,0,0,.35); --logoglow:rgba(120,200,255,.5); --logo:#ffffff;
+  --shadow:rgba(0,0,0,.35); --logoglow:rgba(120,200,255,.5); --logo:#ffffff; --scrim:0;
   color-scheme:dark;
 }
 [hidden]{display:none!important}
 html{background:var(--sky3);overflow:hidden;height:100%;overscroll-behavior:none}
 body{overflow:hidden;height:100%;overscroll-behavior:none}
 body{margin:0;min-height:100vh;font-family:var(--font);font-size:15px;line-height:1.45;color:var(--text);background:transparent}
+/* soft shade behind the clock and battery so the white status bar stays readable in light mode */
+body::after{content:"";position:fixed;left:0;right:0;top:0;height:calc(env(safe-area-inset-top,0px) + 14px);z-index:5;pointer-events:none;
+  background:linear-gradient(rgba(25,45,70,var(--scrim)),rgba(25,45,70,0))}
 /* one background pinned to the whole screen, including behind the status bar and home bar */
 body::before{content:"";position:fixed;top:0;left:0;width:100vw;height:100lvh;z-index:-1;pointer-events:none;
   background:linear-gradient(180deg,var(--sky1) 0%,var(--bgmid) 35%,var(--sky2) 70%,var(--sky3) 100%)}
