@@ -1,5 +1,5 @@
 // Offline support. Change VERSION whenever you upload a new index.html.
-const VERSION = "medifind-v22";
+const VERSION = "medifind-v24";
 const FILES = ["./", "index.html", "manifest.json", "icon-180.png", "icon-512.png", "heart.png"];
 
 self.addEventListener("install", e => {
