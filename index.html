@@ -137,6 +137,13 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
 .stbox{margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--chipbg);border-left:4px solid var(--teal)}
 .stbox h4{margin:0 0 8px;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-txt)}
 .lawsrc{margin-top:10px;font-size:.75rem;color:var(--fine)}
+/* "Did you mean" bubble over a search box */
+.dymhost{position:relative}
+.dym{position:absolute;left:0;right:0;z-index:6;padding:10px 40px 10px 14px;border-radius:14px;line-height:1.35;background:var(--teal2);color:#fff;font-size:.9rem;box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.dym:after{content:"";position:absolute;left:28px;bottom:-7px;border:7px solid transparent;border-bottom:0;border-top-color:var(--teal2)}
+.dym button{border:0;background:none;color:#fff;font:inherit;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.dym .main{font-weight:700}.dym .more{opacity:.88;font-size:.82rem;margin-left:4px}
+.dym .x{position:absolute;right:10px;top:50%;transform:translateY(-50%);text-decoration:none;opacity:.8;font-size:1.05rem;padding:4px}
 /* Interaction Checker */
 .ixentry{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--line);width:100%;text-align:left;color:var(--text);font:inherit;cursor:pointer}
 .ixentry .tile{background:linear-gradient(160deg,var(--coral),var(--salmon))}
@@ -541,6 +548,73 @@ $("groups").addEventListener("click", e => {
 });
 $("q").addEventListener("input", renderList);
 $("cq").addEventListener("input", renderList);
+
+// ---------- "Did you mean?" spelling help ----------
+function dlDist(a, b, max) {   // typo distance (letters missing, extra, wrong or swapped)
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let p2 = null, p = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const c = [i]; let low = i;
+    for (let j = 1; j <= b.length; j++) {
+      let v = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (p2 && i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) v = Math.min(v, p2[j - 2] + 1);
+      c[j] = v; if (v < low) low = v;
+    }
+    if (low > max) return max + 1;
+    p2 = p; p = c;
+  }
+  return p[b.length];
+}
+const sound = w => w.toLowerCase().replace(/[^a-z]/g, "").replace(/^x/, "z").replace(/ph/g, "f").replace(/ck/g, "k").replace(/c(?=[eiy])/g, "s")
+  .replace(/qu/g, "kw").replace(/[cq]/g, "k").replace(/x/g, "ks").replace(/z/g, "s").replace(/th/g, "t").replace(/gh/g, "g").replace(/([^aeiouy])h/g, "$1")
+  .replace(/[aeiouy]+/g, "a").replace(/(.)\1+/g, "$1");
+function vocab(entries) {   // entries: [shown name, text it stands for]
+  const seen = new Set(), out = [];
+  for (const [show, term, rank] of entries) {
+    const t = term.toLowerCase().trim(); if (t.length < 3 || seen.has(t)) continue; seen.add(t);
+    out.push({ show, t, s: sound(t), rank: rank || 0 });
+  }
+  return out;
+}
+function suggest(q, voc) {
+  q = q.toLowerCase().trim(); if (q.length < 3) return [];
+  if (voc.some(v => v.t.includes(q))) return [];   // spelled fine (or still being typed)
+  const qs = sound(q), max = q.length <= 4 ? 1 : q.length <= 7 ? 2 : 3, hits = [];
+  for (const v of voc) {
+    const pre = v.t.slice(0, q.length + 1), preS = v.s.slice(0, qs.length + 1);
+    const d = Math.min(dlDist(q, v.t, max), dlDist(q, pre, max), dlDist(q, v.t.slice(0, q.length), max));
+    const dsr = dlDist(qs, v.s, 1), ds = dsr <= 1 ? dsr + .5 : 99;   // sounds-alike match
+    const sc = Math.min(d, ds); if (sc <= max) hits.push([sc, -v.rank, v.t.length, v]);
+  }
+  hits.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2]);
+  const names = []; for (const h of hits) { if (!names.includes(h[3].show)) names.push(h[3].show); if (names.length === 2) break; }
+  return names;
+}
+let medVoc = null, medVocFor = null, clsVoc = null;
+const medVocab = () => medVocFor === ALL ? medVoc : (medVocFor = ALL, medVoc = vocab(ALL.flatMap(m => {
+  const r = DETAILS[m.generic] ? 2 : 0, first = m.generic.split(";")[0].trim().split(" ")[0];
+  return [[m.title, m.title, r + (m.kind === "b" ? 1 : 0)], ...m.variants.map(v => [v, v, r]), ...m.old.map(o => [o.replace(/ \(discontinued\)/i, ""), o.replace(/ \(discontinued\)/i, ""), r - 1]),
+    [capW(m.generic.split(";")[0].trim()), m.generic, r], [capW(first), first, r]];
+})));
+const clsVocab = () => clsVoc || (clsVoc = vocab(CATS.flatMap(([n, d]) => [[n, n, 2], ...(n + " " + d).split(/[^A-Za-z]+/).filter(w => w.length > 3).map(w => [w.toLowerCase(), w, 0])])));
+const supVocab = () => vocab(IX.supp.map(([n]) => [n.replace(/ \(.*\)/, ""), n, 1]));
+function attachDYM(input, getVoc) {
+  const host = input.parentElement; host.classList.add("dymhost");
+  const bub = document.createElement("div"); bub.className = "dym"; bub.hidden = true; host.appendChild(bub);
+  let closedFor = null;
+  const pick = name => { input.value = name; bub.hidden = true; input.dispatchEvent(new Event("input", { bubbles: true })); input.focus(); };
+  const update = () => {
+    const q = input.value; if (q === closedFor) return;
+    const sug = suggest(q, getVoc());
+    if (!sug.length) { bub.hidden = true; return; }
+    bub.innerHTML = `Did you mean <button type="button" class="main">${esc(sug[0])}</button>?${sug[1] ? `<span class="more">or <button type="button">${esc(sug[1])}</button></span>` : ""}<button type="button" class="x" aria-label="Close">✕</button>`;
+    bub.hidden = false; bub.style.top = (input.offsetTop - bub.offsetHeight - 8) + "px";
+  };
+  bub.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; if (b.classList.contains("x")) { closedFor = input.value; bub.hidden = true; } else pick(b.textContent); });
+  input.addEventListener("input", () => { if (input.value !== closedFor) closedFor = null; update(); });
+}
+attachDYM($("q"), medVocab);
+attachDYM($("cq"), clsVocab);
 ORDER.forEach(i => $("f-cat").add(new Option(CATS[i][0], i)));
 $("f-preg").add(new Option("Not set", ""));
 for (let i = 1; i <= 10; i++) $("f-preg").add(new Option(i + (i === 1 ? " (safest)" : i === 10 ? " (most dangerous)" : ""), i));
@@ -664,6 +738,7 @@ $("ixQ").addEventListener("input", () => {
     ...meds.map(([, m]) => `<button type="button" data-k="${esc(m.id)}"><b>${esc(m.title)}</b> <small>· ${esc(m.kind === "b" ? fmtGen(m.generic) : "Generic")}${schedOf(m) ? " · C" + schedOf(m) : ""}</small></button>`)].join("");
   $("ixSug").innerHTML = html || `<button type="button" disabled><small>No matches</small></button>`; $("ixSug").hidden = false;
 });
+attachDYM($("ixQ"), () => medVocab().concat(supVocab()));
 $("ixSug").addEventListener("click", e => { const b = e.target.closest("button[data-k]"); if (b) ixAdd(b.dataset.k); });
 $("ixQuick").addEventListener("click", e => { const b = e.target.closest("button[data-k]"); if (b) ixAdd(b.dataset.k); });
 $("ixList").addEventListener("click", e => { const b = e.target.closest("button[data-k]"); if (b) { IXL = IXL.filter(k => k !== b.dataset.k); ixSave(); renderIx(); } });
