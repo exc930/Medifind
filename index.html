@@ -137,6 +137,21 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
 .stbox{margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--chipbg);border-left:4px solid var(--teal)}
 .stbox h4{margin:0 0 8px;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-txt)}
 .lawsrc{margin-top:10px;font-size:.75rem;color:var(--fine)}
+/* wide windows (computers): wider home page with a class grid; an opened medicine shows in a right-hand panel */
+@media (min-width:900px){
+  body:not(.split) #listPane .wrap{max-width:1180px}
+  body:not(.split) #listPane .hero{max-width:760px;width:100%;margin-left:auto;margin-right:auto}
+  body:not(.split) #listPane .bar{max-width:1180px}
+  body:not(.split) #groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+  body:not(.split) #groups > *{margin:0}
+  body:not(.split) #groups .grp:has(.grp-head[aria-expanded="true"]){grid-column:1/-1}
+  body:not(.split) #list{max-width:760px;margin-left:auto;margin-right:auto}
+  body.split #pager{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,460px) minmax(0,820px) minmax(0,1fr)}   /* list + medicine centered as a pair */
+  body.split #listPane{grid-column:2;grid-row:1;border-right:1px solid var(--fline)}
+  body.split #cardPane,body.split #editPane{grid-column:3;grid-row:1}
+  body.split #cardPane .wrap,body.split #editPane .wrap{max-width:780px;margin:0 auto}
+}
+@media (min-width:1200px){ body:not(.split) #groups{grid-template-columns:repeat(3,minmax(0,1fr))} }
 .aka{color:var(--sub);font-size:.78rem;margin-top:3px;line-height:1.35}
 .sec-bar{display:flex;align-items:center;gap:10px}
 .sec-bar .lab{flex:1;background:var(--card);border-radius:999px;padding:6px 14px;font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
@@ -589,8 +604,20 @@ function neighbors() {
   const prev = navIdx > 0 ? stack[navIdx - 1] : null, next = navIdx < navMax ? stack[navIdx + 1] : null;
   return { prev, next, pv: prev && viewName(prev), nv: next && viewName(next) };
 }
+const WIDE = () => matchMedia("(min-width: 900px)").matches;
 function arrange() {   // previous page on the left, current in the middle, next on the right
   const { pv, nv } = neighbors(), pager = $("pager");
+  const split = WIDE() && CUR !== "listView";
+  if (document.body.classList.contains("split") !== split) { document.body.classList.toggle("split", split); requestAnimationFrame(() => dispatchEvent(new Event("layoutchange"))); }
+  if (WIDE()) {   // computer window: the list stays on the left, the opened medicine on the right
+    for (const v of ["listView", "cardView", "editView"]) {
+      const pane = $(PANE[v]), was = pane.hidden;
+      pane.hidden = !(v === "listView" || v === CUR);
+      if (v === "listView" && was && !pane.hidden) pane.scrollTop = scrollY;
+      pane.style.order = v === "listView" ? 0 : 1;
+    }
+    pager.scrollLeft = 0; return;
+  }
   for (const v of ["listView", "cardView", "editView"]) {
     const pane = $(PANE[v]), was = pane.hidden;
     pane.hidden = !(v === CUR || v === pv || v === nv);
@@ -600,7 +627,10 @@ function arrange() {   // previous page on the left, current in the middle, next
   quiet = true; pager.scrollLeft = $(PANE[CUR]).offsetLeft;
   requestAnimationFrame(() => { pager.scrollLeft = $(PANE[CUR]).offsetLeft; quiet = false; });
 }
-function prepNeighbors() { const { prev, next } = neighbors(); if (prev) paint(prev); if (next) paint(next); }
+function prepNeighbors() {
+  if (WIDE()) { const st = stack[navIdx]; renderList(); if (st.v !== "list") paint(st); return; }
+  const { prev, next } = neighbors(); if (prev) paint(prev); if (next) paint(next);
+}
 function commit(dir) {   // the swipe (or button) landed on the next or previous page
   navIdx += dir; const st = stack[navIdx];
   if (dir < 0) { ignorePop = true; history.back(); }
@@ -620,6 +650,7 @@ function glide(left, done, ms = 260) {   // smooth slide of the page strip
 }
 function slide(dir) {   // buttons: glide to the neighbor page, same as a swipe
   const { pv, nv } = neighbors(), v = dir < 0 ? pv : nv; if (!v) return;
+  if (WIDE()) return commit(dir);
   glide($(PANE[v]).offsetLeft, () => commit(dir));
 }
 function go(st) {   // open a new page to the right and glide to it
@@ -631,7 +662,7 @@ function jump(n) { navIdx += n; ignorePop = true; history.go(n); CUR = viewName(
   const pager = $("pager"), standalone = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
   let sx = 0, sy = 0, t0 = 0, base = 0, mode = -1, dir = 0, lo = 0, hi = 0, dx = 0;
   pager.addEventListener("touchstart", e => {
-    mode = -1; if (e.touches.length !== 1 || quiet) return;
+    mode = -1; if (e.touches.length !== 1 || quiet || WIDE()) return;
     const t = e.touches[0];
     if (!standalone && t.clientX < 20) return;   // in Safari, the very edge belongs to Safari's own back swipe
     sx = t.clientX; sy = t.clientY; t0 = Date.now(); base = pager.scrollLeft; dx = 0; mode = 0;
@@ -893,12 +924,13 @@ $("imp").onchange = async e => {
   const CD = { tri: "rgba(70,150,255,.08)", line: "rgba(90,190,255,.5)", dot: "#eaf8ff", glow: "rgba(80,190,255,.9)", ecg: "rgba(255,70,80,.55)", hot: "#ff4d5a" }, CL = { tri: "rgba(40,130,180,.07)", line: "rgba(30,115,160,.38)", dot: "#1f86b3", glow: "rgba(31,134,179,.5)", ecg: "rgba(201,71,47,.4)", hot: "#d23b2b" };
   let C = CL;
   const BEAT = 700, SWEEP = BEAT * 4;   // the trace crosses the screen once every 4 beats, so every spike lands on a heartbeat
-  let W, H, s, ox, oy, dpr;
+  let W, H, s, ox, oy, dpr, E0 = 0, EW = 1;
   function layout() {
     const FW = fig.clientWidth, L = fig.getBoundingClientRect().left;   // canvas spans the whole screen width
     W = document.documentElement.clientWidth; cv.style.left = -L + "px"; cv.style.width = W + "px";
     s = Math.min(FW * .96, 360) / 300; ox = L + (FW - 300 * s) / 2; oy = 4;
     H = Math.round(oy + 232 * s); fig.style.height = H + "px";
+    EW = W >= 900 ? Math.min(W, 300 * s * 2.4, FW) : W; E0 = W >= 900 ? ox + 150 * s - EW / 2 : 0;   // wide windows: the line stays around the body
     dpr = Math.min(devicePixelRatio || 1, 2); cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (still) draw(0);
   }
@@ -913,7 +945,7 @@ $("imp").onchange = async e => {
   }
   function ecgPath(yE) {
     const amp = 30 * s; ctx.beginPath();
-    for (let x = 0; x <= W; x += 1) { const y = yE - wave(((x / W) * 4) % 1) * amp; x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    for (let x = E0; x <= E0 + EW; x += 1) { const y = yE - wave((((x - E0) / EW) * 4) % 1) * amp; x > E0 ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
   }
   function draw(t) {
     dark = document.documentElement.dataset.mode === "dark"; C = dark ? CD : CL;
@@ -947,14 +979,14 @@ $("imp").onchange = async e => {
     ctx.lineJoin = "round"; ctx.lineCap = "round";
     
     if (t) {
-      const head = ((t % SWEEP) / SWEEP) * W, tail = W / 4;   // the bright head is at the same point of the beat as the heart
+      const head = E0 + ((t % SWEEP) / SWEEP) * EW, tail = EW / 4;   // the bright head is at the same point of the beat as the heart
       ctx.save(); ctx.beginPath(); ctx.rect(head - tail, 0, tail + 2, H); ctx.clip();
       const lg = ctx.createLinearGradient(head - tail, 0, head, 0); lg.addColorStop(0, "rgba(255,80,80,0)"); lg.addColorStop(1, C.hot);
       ctx.strokeStyle = lg; ctx.lineWidth = 2.2; ctx.shadowColor = C.hot; ctx.shadowBlur = 8; ecgPath(yE); ctx.stroke(); ctx.restore();
     }
   }
   function loop(t) { draw(t); requestAnimationFrame(loop); }
-  layout(); addEventListener("resize", layout); addEventListener("modechange", () => { if (still) draw(0); });
+  layout(); addEventListener("resize", layout); addEventListener("layoutchange", layout); addEventListener("modechange", () => { if (still) draw(0); });
   addEventListener("fxchange", () => { if (FX.body || FX.ekg) { layout(); if (still) draw(0); } });
   if (still) heartImg.onload = () => draw(0); else requestAnimationFrame(loop);
 })();
