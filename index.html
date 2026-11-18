@@ -236,7 +236,6 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
 .ixnone{color:var(--sub);font-size:.88rem}
 .ixleg{font-size:.75rem;color:var(--fine);margin-top:14px;line-height:1.5}
 /* Settings is its own page: nothing else on the home page shows while it's open */
-body.setopen #listView > div > :not(.bar):not(#settings){display:none!important}
 #settings .settitle{margin:0 0 4px;font-size:1.35rem;font-weight:700;color:var(--text)}
 @media (min-width:900px){ body:not(.split) #settings{max-width:760px;width:100%;margin:0 auto} }
 /* wide windows (computers): wider home page with a class grid; an opened medicine shows in a right-hand panel */
@@ -334,30 +333,6 @@ form select{background-color:var(--field)}
   <div id="listView" class="view">
     <div style="display:flex;flex-direction:column;gap:14px">
       <div class="bar"><button class="pill" id="addBtn" type="button">+ Add</button><button class="pill cap" id="setBtn" type="button" aria-label="Settings" aria-expanded="false"><svg viewBox="0 0 24 24"><g transform="rotate(-40 12 12)"><rect x="2.5" y="8" width="19" height="8" rx="4" fill="#f3f5f7"/><path d="M12 8h5.5a4 4 0 0 1 0 8H12z" fill="#c95a50"/><rect x="2.5" y="8" width="19" height="8" rx="4" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="1"/><path d="M5 10.2h5" stroke="#fff" stroke-opacity=".7" stroke-width="1" stroke-linecap="round"/></g></svg></button></div>
-      <div class="card panel" id="settings" hidden>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <h2 class="settitle">Settings</h2>
-          <b>Appearance</b>
-          <div class="seg" id="modeSeg" role="group" aria-label="Appearance"><button type="button" data-mode="light">Light</button><button type="button" data-mode="dark">Dark</button></div>
-          <b style="margin-top:6px">Information</b>
-          <label class="tog" for="opt-preg"><span>Show pregnancy info</span><input type="checkbox" id="opt-preg"><i></i></label>
-          <b style="margin-top:6px">Background</b>
-          <label class="tog" for="fx-body"><span>Body with beating heart</span><input type="checkbox" id="fx-body"><i></i></label>
-          <label class="tog" for="fx-ekg"><span>Heartbeat line</span><input type="checkbox" id="fx-ekg"><i></i></label>
-          <label class="tog" for="fx-dna"><span>DNA helix</span><input type="checkbox" id="fx-dna"><i></i></label>
-          <span class="fine">Floating in the background</span>
-          <div class="seg" id="floatSeg" role="group" aria-label="Floating in the background"><button type="button" data-f="none">None</button><button type="button" data-f="specks">Specks</button><button type="button" data-f="molecules">Molecules</button><button type="button" data-f="color">Colorful</button></div>
-          <button class="btn2" id="fx-plain" type="button" style="align-self:flex-start">Plain background (turn all off)</button>
-  <div id="bk">
-          <div style="display:flex;flex-direction:column;gap:12px">
-            <div><b>Backup &amp; restore</b><div class="fine" id="bkInfo"></div></div>
-            <div class="actions"><button class="btn" id="exp" type="button">Export backup</button><label class="btn2" for="imp">Import backup</label><input id="imp" type="file" accept=".json,application/json" hidden></div>
-            <p class="fine">Edits are saved on this phone. Export a backup now and then and keep it in Files or iCloud Drive.</p>
-          </div>
-        </div>
-          <button class="btn" id="setDone" type="button" style="margin-top:8px">Done</button>
-        </div>
-      </div>
       <div class="top-art" id="topArt">
         <div class="brand">
           <div class="logo">MEDIFIND</div>
@@ -394,6 +369,37 @@ form select{background-color:var(--field)}
     </div>
   </div>
 
+</div></section>
+<section class="pane" id="setPane" hidden><div class="wrap">
+  <!-- Settings -->
+  <div id="setView" class="view">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card panel" id="settings">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <h2 class="settitle">Settings</h2>
+          <b>Appearance</b>
+          <div class="seg" id="modeSeg" role="group" aria-label="Appearance"><button type="button" data-mode="light">Light</button><button type="button" data-mode="dark">Dark</button></div>
+          <b style="margin-top:6px">Information</b>
+          <label class="tog" for="opt-preg"><span>Show pregnancy info</span><input type="checkbox" id="opt-preg"><i></i></label>
+          <b style="margin-top:6px">Background</b>
+          <label class="tog" for="fx-body"><span>Body with beating heart</span><input type="checkbox" id="fx-body"><i></i></label>
+          <label class="tog" for="fx-ekg"><span>Heartbeat line</span><input type="checkbox" id="fx-ekg"><i></i></label>
+          <label class="tog" for="fx-dna"><span>DNA helix</span><input type="checkbox" id="fx-dna"><i></i></label>
+          <span class="fine">Floating in the background</span>
+          <div class="seg" id="floatSeg" role="group" aria-label="Floating in the background"><button type="button" data-f="none">None</button><button type="button" data-f="specks">Specks</button><button type="button" data-f="molecules">Molecules</button><button type="button" data-f="color">Colorful</button></div>
+          <button class="btn2" id="fx-plain" type="button" style="align-self:flex-start">Plain background (turn all off)</button>
+  <div id="bk">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div><b>Backup &amp; restore</b><div class="fine" id="bkInfo"></div></div>
+            <div class="actions"><button class="btn" id="exp" type="button">Export backup</button><label class="btn2" for="imp">Import backup</label><input id="imp" type="file" accept=".json,application/json" hidden></div>
+            <p class="fine">Edits are saved on this phone. Export a backup now and then and keep it in Files or iCloud Drive.</p>
+          </div>
+        </div>
+          <button class="btn" id="setDone" type="button" style="margin-top:8px">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div></section>
 <section class="pane" id="ixPane" hidden><div class="wrap">
   <!-- Interaction Checker -->
@@ -827,7 +833,7 @@ for (let i = 1; i <= 10; i++) $("f-preg").add(new Option(i + (i === 1 ? " (safes
 
 // ---------- Views ----------
 let current = null, curName = null, scrollY = 0, CUR = "listView";
-const PANE = { listView: "listPane", cardView: "cardPane", editView: "editPane", ixView: "ixPane" };
+const PANE = { listView: "listPane", cardView: "cardPane", editView: "editPane", ixView: "ixPane", setView: "setPane" };
 function show(v) { CUR = v; arrange(); }
 const bullets = (title, arr) => `<div class="sec"><h3>${title}</h3>${arr.length ? `<ul>${arr.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<div class="none">Not filled in yet</div>`}</div>`;
 function openCard(id, name, prep) {
@@ -1063,11 +1069,12 @@ function toast(msg, undo) {   // short message; with undo it gets an UNDO button
 // ---------- Navigation: pages side by side, swiped natively; phone history kept in step ----------
 let navIdx = 0, navMax = 0, pendingPush = false, ignorePop = false, quiet = false, settleT;
 const stack = [{ v: "list" }];
-const viewName = st => st.v === "card" ? "cardView" : st.v === "edit" ? "editView" : st.v === "ix" ? "ixView" : "listView";
+const viewName = st => st.v === "card" ? "cardView" : st.v === "edit" ? "editView" : st.v === "ix" ? "ixView" : st.v === "set" ? "setView" : "listView";
 function paint(st) {   // fill a page with its content without moving to it
   if (st.v === "card" && med(st.id)) return openCard(st.id, st.name, true), true;
   if (st.v === "edit" && (st.id === null || med(st.id))) return openEdit(st.id, true), true;
   if (st.v === "ix") return renderIx(), true;
+  if (st.v === "set") return bkInfo(), true;
   renderList(); return st.v === "list";
 }
 function neighbors() {
@@ -1080,7 +1087,7 @@ function arrange() {   // previous page on the left, current in the middle, next
   const split = WIDE() && CUR !== "listView";
   if (document.body.classList.contains("split") !== split) { document.body.classList.toggle("split", split); requestAnimationFrame(() => dispatchEvent(new Event("layoutchange"))); }
   if (WIDE()) {   // computer window: the list stays on the left, the opened medicine on the right
-    for (const v of ["listView", "cardView", "editView", "ixView"]) {
+    for (const v of ["listView", "cardView", "editView", "ixView", "setView"]) {
       const pane = $(PANE[v]), was = pane.hidden;
       pane.hidden = !(v === "listView" || v === CUR);
       if (v === "listView" && was && !pane.hidden) pane.scrollTop = scrollY;
@@ -1088,7 +1095,7 @@ function arrange() {   // previous page on the left, current in the middle, next
     }
     pager.scrollLeft = 0; return;
   }
-  for (const v of ["listView", "cardView", "editView", "ixView"]) {
+  for (const v of ["listView", "cardView", "editView", "ixView", "setView"]) {
     const pane = $(PANE[v]), was = pane.hidden;
     pane.hidden = !(v === CUR || v === pv || v === nv);
     if (v === "listView" && was && !pane.hidden) pane.scrollTop = scrollY;   // list comes back where you left it
@@ -1146,11 +1153,13 @@ function go(st) {
 function jump(n) { navIdx += n; ignorePop = true; history.go(n); CUR = viewName(stack[navIdx]); if (CUR === "listView") current = null; prepNeighbors(); arrange(); }
 (() => {   // swipe right = back, swipe left = forward: both pages slide side by side under your finger
   const pager = $("pager"), standalone = navigator.standalone || matchMedia("(display-mode: standalone)").matches;
-  let sx = 0, sy = 0, t0 = 0, base = 0, mode = -1, dir = 0, lo = 0, hi = 0, dx = 0;
+  let sx = 0, sy = 0, t0 = 0, base = 0, mode = -1, dir = 0, lo = 0, hi = 0, dx = 0, edge = 0;
   pager.addEventListener("touchstart", e => {
     mode = -1; if (e.touches.length !== 1 || quiet || WIDE()) return;
     const t = e.touches[0];
-    if (!standalone && t.clientX < 20) return;   // in Safari, the very edge belongs to Safari's own back swipe
+    const W = pager.clientWidth, EDGE = 30;   // like iPhone: left edge = back, right edge = forward; the middle never changes pages
+    edge = t.clientX < EDGE ? -1 : t.clientX > W - EDGE ? 1 : 0;
+    if (!edge || !standalone) return;   // in Safari (not the home-screen app) both edges belong to Safari's own back/forward
     sx = t.clientX; sy = t.clientY; t0 = Date.now(); base = pager.scrollLeft; dx = 0; mode = 0;
   }, { passive: true });
   pager.addEventListener("touchmove", e => {
@@ -1159,6 +1168,7 @@ function jump(n) { navIdx += n; ignorePop = true; history.go(n); CUR = viewName(
     if (mode === 0) {
       if (Math.abs(mx) < 8 || Math.abs(mx) < Math.abs(my)) { if (Math.abs(my) > 8) mode = -1; return; }   // up/down: the page scrolls
       const { pv, nv } = neighbors(); dir = mx > 0 ? -1 : 1;
+      if (dir !== edge) { mode = -1; return; }   // a swipe from the left edge can only go back, from the right edge only forward
       const target = dir < 0 ? pv : nv;
       if (!target) { mode = -1; return; }                                     // nothing that way: stay still
       if (dir < 0 && formDirty()) { toast("Tap Save or Cancel first"); mode = -1; return; }
@@ -1196,15 +1206,9 @@ function setMode(m) {
 setMode(document.documentElement.dataset.mode === "dark" ? "dark" : "light");
 $("setBtn").onclick = () => {
   const b = $("setBtn"); b.classList.remove("spin"); void b.offsetWidth; b.classList.add("spin");
-  setOpen($("settings").hidden);
+  go({ v: "set" });   // Settings is its own page: edge-swipe back closes it, edge-swipe forward reopens it
 };
-function setOpen(open) {   // Settings shows on its own, then the home page comes back
-  $("settings").hidden = !open; $("setBtn").setAttribute("aria-expanded", open);
-  document.body.classList.toggle("setopen", open);
-  if (open) { bkInfo(); $("listPane").scrollTop = 0; }
-}
-$("setDone").onclick = () => setOpen(false);
-$("addBtn").addEventListener("click", () => { if (!$("settings").hidden) setOpen(false); });
+$("setDone").onclick = () => slide(-1);
 document.querySelectorAll("#modeSeg button").forEach(b => b.onclick = () => setMode(b.dataset.mode));
 // background choices, remembered on this phone
 const FX = { body: true, ekg: true, dna: true, float: "molecules" };
