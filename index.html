@@ -186,6 +186,13 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
 .dockbg{position:fixed;left:0;right:0;top:0;z-index:45;background:var(--sky1);border-bottom:1px solid var(--fline);box-shadow:0 6px 16px rgba(0,0,0,.12);display:none}
 body.qdocked .dockbg{display:block}
 body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
+/* search drop-down: filters every match as you type, like the Interactions search */
+.sdd{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;max-height:min(55vh,430px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border:1px solid var(--fline);border-radius:12px;background:var(--sky1);box-shadow:0 14px 34px rgba(0,0,0,.3)}
+.sdd button{display:block;width:100%;text-align:left;padding:10px 14px;border:0;border-bottom:1px solid var(--fline);background:none;color:var(--text);font:inherit;font-size:.92rem;cursor:pointer}
+.sdd button:last-child{border-bottom:0}.sdd small{color:var(--sub)}
+.sdd .r{display:block;color:var(--teal-txt);font-size:.78rem;margin-top:1px}
+.sdd .more{color:var(--sub);font-size:.8rem;text-align:center}
+.hero:has(.sdd:not([hidden])){z-index:41}
 /* bottom tab bar: floating, solid */
 .tabbar{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:48;max-width:520px;margin:0 auto;display:flex;justify-content:space-around;align-items:center;padding:8px 6px;border-radius:26px;background:var(--sky1);border:1px solid var(--fline);box-shadow:0 10px 30px rgba(0,0,0,.3)}
 .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;color:var(--sub);font:inherit;padding:4px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;min-width:0}
@@ -365,7 +372,7 @@ form select{background-color:var(--field)}
       <div class="card hero">
         <h1>Find a medicine</h1>
         <p id="sub">Search by brand or generic name</p>
-        <div id="qph"><div class="qwrap" id="qwrap"><input id="q" type="search" placeholder="e.g. Topamax, migraine or liver" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search medicines"><button type="button" class="qf" id="fBtn2" tabindex="-1" aria-label="Filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filters</button></div></div>
+        <div id="qph"><div class="qwrap" id="qwrap"><input id="q" type="search" placeholder="e.g. Topamax, migraine or liver" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search medicines"><div class="sdd" id="qdd" hidden></div><button type="button" class="qf" id="fBtn2" tabindex="-1" aria-label="Filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filters</button></div></div>
         <div class="sfilt"><button type="button" class="fbtn" id="fBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filters <small id="fSum">All</small></button><button type="button" class="fbtn sbtn" data-s="rx"><i></i>Rx</button><button type="button" class="fbtn sbtn otc" data-s="otc"><i></i>OTC</button></div>
         <div class="recent" id="recent" hidden><div class="rh"><span>Recently viewed</span><button type="button" id="recClear">Clear</button></div><div class="rc" id="recList"></div></div>
       </div>
@@ -395,7 +402,7 @@ form select{background-color:var(--field)}
     <div style="display:flex;flex-direction:column;gap:14px">
       <div class="topnav"><button class="back" id="brBack" type="button">‹ Home</button></div>
       <div class="card hero"><h1 class="brh"><span id="brTitle">Prescription medications</span><span class="badge" id="bcount">0</span></h1><p id="brDesc"></p>
-        <input id="bq" type="search" placeholder="Search prescription medicines only" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search this list"></div>
+        <div class="qwrap"><input id="bq" type="search" placeholder="Search prescription medicines only" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search this list"><div class="sdd" id="bdd" hidden></div></div></div>
       <div class="groups" id="bgroups"></div>
       <div class="list" id="blist" hidden></div>
     </div>
@@ -645,10 +652,7 @@ function setBrowse(sk) {
   renderBrowse();
 }
 function renderBrowse() {
-  const q = $("bq").value.trim();
-  $("bgroups").hidden = !!q; $("blist").hidden = !q;
-  if (!q) return renderGroups();
-  renderSearch(BRC);
+  renderGroups(); renderSearch(BRC);
 }
 const wordRe = q => {   // word-start match that treats singular and plural alike (allergy / allergies, rash / rashes)
   const forms = [q];
@@ -690,7 +694,7 @@ function ixTargets(q) {   // what "Interaction" search looks for: alcohol/foods,
   return out;
 }
 const RGROUPS = [["name", "Name"], ["cls", "Drug class"], ["uses", "Used for"], ["off", "Off-label use"], ["org", "Organ"], ["side", "Side effect"], ["ix", "Interacts with"]];
-const HOME = { q: "q", list: "list", count: "count" }, BRC = { q: "bq", list: "blist", count: "bcount", browse: true };
+const HOME = { q: "q", dd: "qdd" }, BRC = { q: "bq", dd: "bdd", browse: true };
 function renderList() { renderSearch(HOME); if (CUR === "brView") renderBrowse(); }   // after filters or edits change: refresh what's on screen
 function itemHTML(m, why, q = "") {
   const alias = q && !why && !m.title.toLowerCase().includes(q) && !m.generic.includes(q) ? [...m.variants, ...(m.kind === "b" ? m.old : [])].find(x => x.toLowerCase().includes(q)) : "";
@@ -700,8 +704,9 @@ function itemHTML(m, why, q = "") {
 }
 function renderSearch(ctx) {
   const q = $(ctx.q).value.trim().toLowerCase();
-  if (!ctx.browse) { $("list").hidden = !q; document.querySelector("#listView .sec-bar").hidden = !q; }
-  if (!q) return;
+  const dd = $(ctx.dd);
+  if (!ctx.browse) { $("list").hidden = true; document.querySelector("#listView .sec-bar").hidden = true; }
+  if (!q) { dd.hidden = true; return; }
   const inScope = ctx.browse ? SECT.find(x => x[0] === BR)[3] : null;
   const re = wordRe(q), by = {}, on = k => SBY.has(k), narrowed = SBY.size < 7 || SRX.size < 2 || activeFilters() > 0;
   const tgt = on("ix") && q.length >= 3 ? ixTargets(q) : [];
@@ -729,13 +734,11 @@ function renderSearch(ctx) {
     if (hit) by[hit[0]].push([hit[1], m, hit[2]]);
   }
   const total = RGROUPS.reduce((n, [k]) => n + by[k].length, 0), PER = 40;
-  if (!ctx.browse) { $("count").textContent = total.toLocaleString(); $("secLab").textContent = "Results"; }
-  const item = ([, m, why]) => itemHTML(m, why, q);
-  $(ctx.list).innerHTML = total ? RGROUPS.filter(([k]) => by[k].length).map(([k, label]) => {
-    const arr = by[k].sort((a, b) => (F.sort === "az" ? 0 : b[0] - a[0]) || a[1].title.localeCompare(b[1].title));
-    return `<div class="rgrp">${label} <span class="n">${arr.length.toLocaleString()}</span></div>` + arr.slice(0, PER).map(item).join("")
-      + (arr.length > PER ? `<div class="note">Showing ${PER} of ${arr.length.toLocaleString()}. Add another word or pick a "Search by" option to narrow it down.</div>` : "");
-  }).join("") : `<div class="card empty">No matches${narrowed ? " with these search options" : ""}. Try another spelling${narrowed ? " or turn more options back on" : ", or tap Add below to create it"}.</div>`;
+  const rows = RGROUPS.flatMap(([k]) => by[k].sort((a, b) => (F.sort === "az" ? 0 : b[0] - a[0]) || a[1].title.localeCompare(b[1].title))), MAX = 60;
+  const row = ([, m, why]) => `<button type="button" data-id="${esc(m.id)}"><b>${esc(m.title)}</b> <small>· ${esc(m.kind === "b" ? fmtGen(m.generic) : "Generic")}${schedOf(m) ? " · C" + schedOf(m) : ""}${m.otc === 1 ? " · OTC" : ""}</small>${why ? `<span class="r">${esc(why)}</span>` : ""}</button>`;
+  dd.innerHTML = rows.length ? rows.slice(0, MAX).map(row).join("") + (rows.length > MAX ? `<button type="button" class="more" disabled>${rows.length - MAX} more · keep typing to narrow it down</button>` : "")
+    : `<button type="button" class="more" disabled>No matches${narrowed ? " with these filters" : ""}</button>`;
+  dd.hidden = false; dd.scrollTop = 0;
 }
 // ---------- Filters sheet (slides up from the bottom, like iPhone apps) ----------
 const FSEC = [
@@ -802,7 +805,13 @@ $("recClear").onclick = () => { const was = RECENT.slice(); RECENT = []; try { l
   toast("Recently viewed cleared", () => { RECENT = was; try { localStorage.setItem("medifind-recent", JSON.stringify(RECENT)); } catch (e) {} renderRecent(); }); };
 renderRecent();
 ["list", "blist", "mineList"].forEach(id => $(id).addEventListener("click", e => { const b = e.target.closest(".item"); if (b) go({ v: "card", id: b.dataset.id, name: b.dataset.name }); }));
-$("bq").addEventListener("input", renderBrowse);
+$("bq").addEventListener("input", () => renderSearch(BRC));
+["qdd", "bdd"].forEach(id => $(id).addEventListener("click", e => { const b = e.target.closest("button[data-id]"); if (b) { $(id).hidden = true; document.activeElement.blur(); go({ v: "card", id: b.dataset.id, name: "" }); } }));
+["q", "bq"].forEach(id => {
+  $(id).addEventListener("focus", () => { if ($(id).value.trim()) renderSearch(id === "q" ? HOME : BRC); });
+  $(id).addEventListener("keydown", e => { if (e.key === "Enter") $(id).blur(); });
+});
+document.addEventListener("pointerdown", e => { for (const id of ["qdd", "bdd"]) if (!$(id).hidden && !e.target.closest(".qwrap") && !e.target.closest(".dym")) $(id).hidden = true; });
 $("brBack").onclick = () => slide(-1);
 document.querySelectorAll(".sbtn").forEach(b => b.onclick = () => go({ v: "br", s: b.dataset.s }));
 function renderMine() {   // My meds: medicines you added, then ones you changed
@@ -885,6 +894,7 @@ function attachDYM(input, getVoc) {
   input.addEventListener("input", () => { if (input.value !== closedFor) closedFor = null; update(); });
 }
 attachDYM($("q"), medVocab);
+attachDYM($("bq"), medVocab);
 ORDER.forEach(i => $("f-cat").add(new Option(CATS[i][0], i)));
 $("f-preg").add(new Option("Not set", ""));
 for (let i = 1; i <= 10; i++) $("f-preg").add(new Option(i + (i === 1 ? " (safest)" : i === 10 ? " (most dangerous)" : ""), i));
