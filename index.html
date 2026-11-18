@@ -249,7 +249,8 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
   .snav:hover{background:var(--chipbg);color:var(--text)}
   .snav.on{background:var(--chipbg);color:var(--teal-txt)}
   .si{flex:none;width:24px;height:24px;display:grid;place-items:center}.si svg{width:22px;height:22px}
-  .snav.pill .si svg{width:26px;height:26px;color:var(--ink)}.snav.pill.spin .si svg{animation:spin .6s ease-in-out}
+  .snav.pill .si svg{width:26px;height:26px;color:var(--ink)}
+  .snav.pill,.snav.pill:hover,.snav.pill.on,.snav.pill:focus{background:none!important;color:var(--sub);outline:none;box-shadow:none}   /* the Settings pill just spins: no highlight box */.snav.pill.spin .si svg{animation:spin .6s ease-in-out}
   .sl{flex:1}
   .sbadge:empty{display:none}.sbadge{background:var(--teal);color:#fff;border-radius:9px;font-size:.7rem;font-weight:800;padding:1px 7px}
   .sadd{justify-content:center;margin:14px 2px 4px;color:#fff;background:linear-gradient(160deg,var(--coral),var(--salmon));border-radius:999px;font-weight:700}
@@ -260,7 +261,8 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
   body.sidecol .sadd{width:46px;height:46px;border-radius:50%;margin:14px auto 4px;padding:0}
   #webtop{display:flex;align-items:center;gap:12px;position:fixed;top:0;right:0;left:var(--sidew);height:var(--toph);z-index:45;padding:0 32px;background:#081a33;border-bottom:1px solid var(--fline);transition:left .2s}
   :root:not([data-mode="dark"]) #webtop{background:#eef4fa}
-  #webtop .wq{flex:1;max-width:760px}
+  #webtop{padding:0 max(32px,calc((100vw - var(--sidew) - 1120px) / 2 + 32px))!important}   /* search lines up with the page content below */
+  #webtop .wq{flex:1;max-width:none}
   #webtop .fbtn{align-self:center;margin:0}
   #webtop .wq input{padding-left:42px;padding-right:40px}
   #webtop .wqi{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--sub);width:18px;height:18px;pointer-events:none}.wqi svg{width:18px;height:18px}
