@@ -196,9 +196,12 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
 /* medicine card: Key info box + More info rows */
 .kchks{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
 .kchk{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:.92rem;font-weight:600;cursor:pointer}
-.kchk input{appearance:none;-webkit-appearance:none;flex:none;width:22px;height:22px;margin:0;border-radius:7px;border:2px solid var(--fline);background:var(--field);display:grid;place-items:center;cursor:pointer}
-.kchk input:checked{background:var(--teal);border-color:var(--teal)}
-.kchk input:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.kchk{line-height:1.25}
+.kchk input{position:absolute;opacity:0;width:1px;height:1px;margin:0;padding:0;pointer-events:none}
+.kchk .box{flex:none;position:relative;width:22px;height:22px;box-sizing:border-box;border-radius:7px;border:2px solid var(--fline);background:var(--field)}
+.kchk input:checked + .box{background:var(--teal);border-color:var(--teal)}
+.kchk input:checked + .box::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.kchk input:focus-visible + .box{outline:2px solid var(--teal-txt);outline-offset:2px}
 .klbl{margin:16px 2px 6px;font-size:.64rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--sub)}
 .kbox{border:1px solid var(--fline);border-radius:14px;padding:12px 14px;background:var(--field)}
 .kbox .ks + .ks{border-top:1px solid var(--fline);margin-top:12px;padding-top:12px}
@@ -301,6 +304,10 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
   #bgroups .grp:has(.grp-head[aria-expanded="true"]){grid-column:1/-1}
 }
 /* bottom tab bar: floating, solid */
+.tbblur{position:fixed;left:0;right:0;bottom:0;height:calc(100px + env(safe-area-inset-bottom,0px));z-index:47;pointer-events:none;
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);background:color-mix(in srgb,var(--sky2) 35%,transparent);
+  -webkit-mask-image:linear-gradient(transparent,#000 38%);mask-image:linear-gradient(transparent,#000 38%)}
+@media (min-width:900px){ .tbblur{display:none} }
 .tabbar{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:48;max-width:520px;margin:0 auto;display:flex;justify-content:space-around;align-items:center;padding:8px 6px;border-radius:26px;background:var(--sky1);border:1px solid var(--fline);box-shadow:0 10px 30px rgba(0,0,0,.3)}
 .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;color:var(--sub);font:inherit;padding:4px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;min-width:0}
 .tabbar .i{position:relative;width:30px;height:30px;display:grid;place-items:center;transition:background .2s}
@@ -606,7 +613,7 @@ form select{background-color:var(--field)}
 </div></section>
 </div>
 <div class="toast" id="toast" hidden></div>
-<nav class="tabbar" id="tabbar" aria-label="Main"><button type="button" data-t="home" class=""><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><small>Home</small></button><button type="button" data-t="mine" class=""><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2h6V3M9 11h6M9 15h4"/></svg></span><small>My Meds</small></button><button type="button" data-t="add" class="add"><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span><small>Add</small></button><button type="button" data-t="ix" class=""><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="12" r="5"/><circle cx="15.5" cy="12" r="5"/></svg></span><small>Interactions</small></button><button type="button" data-t="set" class="pill"><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(-40 12 12)"><rect x="2.5" y="8" width="19" height="8" rx="4" fill="#f3f5f7"/><path d="M12 8h5.5a4 4 0 0 1 0 8H12z" fill="#c95a50"/><rect x="2.5" y="8" width="19" height="8" rx="4" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="1"/><path d="M5 10.2h5" stroke="#fff" stroke-opacity=".7" stroke-width="1" stroke-linecap="round"/></g></svg></span><small>Settings</small></button></nav>
+<div class="tbblur" aria-hidden="true"></div><nav class="tabbar" id="tabbar" aria-label="Main"><button type="button" data-t="home" class=""><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><small>Home</small></button><button type="button" data-t="mine" class=""><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2h6V3M9 11h6M9 15h4"/></svg></span><small>My Meds</small></button><button type="button" data-t="add" class="add"><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span><small>Add</small></button><button type="button" data-t="ix" class=""><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="12" r="5"/><circle cx="15.5" cy="12" r="5"/></svg></span><small>Interactions</small></button><button type="button" data-t="set" class="pill"><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(-40 12 12)"><rect x="2.5" y="8" width="19" height="8" rx="4" fill="#f3f5f7"/><path d="M12 8h5.5a4 4 0 0 1 0 8H12z" fill="#c95a50"/><rect x="2.5" y="8" width="19" height="8" rx="4" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="1"/><path d="M5 10.2h5" stroke="#fff" stroke-opacity=".7" stroke-width="1" stroke-linecap="round"/></g></svg></span><small>Settings</small></button></nav>
 
 
 <script>
@@ -1106,7 +1113,7 @@ function cardSections(m, others, list, cnt) {   // in order of importance; check
     + (more.length ? `<div class="mcol">${key.length ? `<div class="klbl">More info</div>` : ""}<div class="accs sec">${more.map(([k, t, meta, body, pk]) => `<details class="acc${sched(k)}"><summary><div class="t"><h3>${t}</h3><span class="pk">${esc(pk)}</span></div><span class="meta">${meta}</span>${chev}</summary><div class="body">${body}</div></details>`).join("")}</div></div>` : "");
 }
 function renderKeyChks() {
-  $("keyChks").innerHTML = KEYS.map(([k, l]) => `<label class="kchk"><input type="checkbox" data-k="${k}"${KEYON.has(k) ? " checked" : ""}>${l}</label>`).join("");
+  $("keyChks").innerHTML = KEYS.map(([k, l]) => `<label class="kchk"><input type="checkbox" data-k="${k}"${KEYON.has(k) ? " checked" : ""}><span class="box"></span><span>${l}</span></label>`).join("");
 }
 function openCard(id, name, prep) {
   const m = med(id); if (!m) return;
