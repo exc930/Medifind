@@ -176,11 +176,16 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
 .recent .rc{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.recent .rc::-webkit-scrollbar{display:none}
 .recent .rc button{flex:none;display:flex;align-items:center;gap:6px;border:1px solid var(--fline);background:var(--field);color:var(--text);border-radius:999px;padding:7px 12px;font:inherit;font-size:.85rem;font-weight:600;cursor:pointer;max-width:220px}
 .recent .rc button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.recent .rc svg{flex:none;width:14px;height:14px;color:var(--sub)}
-.stickybar{position:fixed;top:0;left:0;right:0;z-index:45;display:flex;gap:8px;align-items:center;padding:calc(8px + env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) 8px max(14px,env(safe-area-inset-left,0px));
-  background:color-mix(in srgb,var(--sky1) 90%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--fline);box-shadow:0 6px 16px rgba(0,0,0,.08);transform:translateY(-110%);transition:transform .2s}
-.stickybar.show{transform:none}
-.stickybar input{flex:1;min-width:0;padding:9px 12px;font-size:16px}
-.stickybar .fbtn{align-self:auto;padding:9px 11px}
+/* the search box gets stuck at the top of the screen while you scroll */
+.qwrap{position:relative}
+.qwrap .qf{display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);align-items:center;gap:5px;border:0;border-left:1px solid var(--fline);background:none;color:var(--text);font:inherit;font-size:.85rem;font-weight:700;padding:6px 6px 6px 12px;cursor:pointer}
+.qwrap .qf svg{width:17px;height:17px;color:var(--teal-txt)}
+.qwrap.docked{position:fixed;z-index:46}
+.qwrap.docked .qf{display:flex}
+.qwrap.docked input{padding-right:96px}
+.dockbg{position:fixed;left:0;right:0;top:0;z-index:45;background:var(--sky1);border-bottom:1px solid var(--fline);box-shadow:0 6px 16px rgba(0,0,0,.12);display:none}
+body.qdocked .dockbg{display:block}
+body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
 /* Prescription / OTC sections */
 .sect{overflow:hidden}
 .sect-head{display:flex;align-items:center;gap:12px;width:100%;padding:14px 14px;border:none;background:none;color:var(--text);text-align:left;font:inherit;cursor:pointer}
@@ -365,7 +370,7 @@ form select{background-color:var(--field)}
       <div class="card hero">
         <h1>Find a medicine</h1>
         <p id="sub">Search by brand or generic name</p>
-        <input id="q" type="search" placeholder="e.g. Topamax, migraine or liver" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search medicines">
+        <div id="qph"><div class="qwrap" id="qwrap"><input id="q" type="search" placeholder="e.g. Topamax, migraine or liver" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search medicines"><button type="button" class="qf" id="fBtn2" tabindex="-1" aria-label="Filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filters</button></div></div>
         <div class="recent" id="recent" hidden><div class="rh"><span>Recently viewed</span><button type="button" id="recClear">Clear</button></div><div class="rc" id="recList"></div></div>
         <div class="sfilt"><button type="button" class="fbtn" id="fBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filters <small id="fSum">All</small></button></div>
       </div>
@@ -950,23 +955,27 @@ $("ixQ").addEventListener("input", () => {
   $("ixSug").innerHTML = html || `<button type="button" disabled><small>No matches</small></button>`; $("ixSug").hidden = false;
 });
 attachDYM($("ixQ"), () => medVocab().concat(supVocab()));
-(() => {   // slim search bar pinned to the top once the big search box scrolls away
-  const bar = document.createElement("div"); bar.className = "stickybar"; bar.setAttribute("aria-hidden", "true");
-  bar.innerHTML = `<input type="search" id="q2" placeholder="Search medicines" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search medicines" tabindex="-1"><button type="button" class="fbtn" id="fBtn2" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filters</button>`;
-  document.body.appendChild(bar);
-  const pane = $("listPane"), q2 = $("q2");
+(() => {   // the search box scrolls up with the page, then gets stuck at the top of the screen
+  const pane = $("listPane"), ph = $("qph"), w = $("qwrap"), bg = document.createElement("div");
+  bg.className = "dockbg"; ph.closest(".hero").prepend(bg);   // inside the search card so the box stays on top of it
+  const safeTop = () => parseFloat(getComputedStyle(document.querySelector(".wrap")).paddingTop) || 10;
+  let docked = false;
   const update = () => {
-    const show = CUR === "listView" && !WIDE() && !document.body.classList.contains("setopen") && $("q").getBoundingClientRect().bottom < 0;
-    bar.classList.toggle("show", show); bar.setAttribute("aria-hidden", !show);
-    q2.tabIndex = $("fBtn2").tabIndex = show ? 0 : -1;
-    if (document.activeElement !== q2) q2.value = $("q").value;
+    const r = ph.getBoundingClientRect(), stop = safeTop();
+    const want = CUR === "listView" && !WIDE() && !document.body.classList.contains("setopen") && r.top < stop;
+    if (want) {
+      if (!docked) { ph.style.height = w.offsetHeight + "px"; w.classList.add("docked"); document.body.classList.add("qdocked"); $("fBtn2").tabIndex = 0; docked = true; }
+      Object.assign(w.style, { top: stop + "px", left: r.left + "px", width: r.width + "px" });
+      bg.style.height = (stop + w.offsetHeight + 10) + "px";
+    } else if (docked) {
+      w.classList.remove("docked"); document.body.classList.remove("qdocked"); w.style.cssText = ""; ph.style.height = ""; $("fBtn2").tabIndex = -1; docked = false;
+    }
   };
   pane.addEventListener("scroll", update, { passive: true }); addEventListener("resize", update); addEventListener("layoutchange", update);
-  setInterval(() => { if (bar.classList.contains("show") && CUR !== "listView") update(); }, 500);
-  q2.addEventListener("input", () => {
-    $("q").value = q2.value; renderList();
-    const top = $("q").closest(".hero").offsetTop + $("q").closest(".hero").offsetHeight - 60; if (pane.scrollTop > top) pane.scrollTop = top;   // keep results in view
-    requestAnimationFrame(update);
+  setInterval(() => { if (docked && CUR !== "listView") update(); }, 300);
+  $("q").addEventListener("input", () => {   // while stuck, keep the new results starting right under the box
+    if (!docked) return;
+    requestAnimationFrame(() => { pane.scrollTop += ph.getBoundingClientRect().top - safeTop() + 1; update(); });
   });
   $("fBtn2").onclick = openSheet;
 })();
