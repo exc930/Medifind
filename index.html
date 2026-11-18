@@ -240,7 +240,7 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
   :root{--sidew:232px;--toph:70px}
   body.sidecol{--sidew:76px}
   #tabbar{display:none!important}
-  #side{display:flex;flex-direction:column;gap:4px;position:fixed;left:0;top:0;bottom:0;width:var(--sidew);z-index:46;padding:18px 12px;background:rgba(4,14,30,.55);border-right:1px solid var(--fline);transition:width .2s;overflow:hidden}
+  #side{display:flex;flex-direction:column;gap:4px;position:fixed;left:0;top:0;bottom:0;width:var(--sidew);box-sizing:border-box;z-index:46;padding:18px 12px;background:rgba(4,14,30,.55);border-right:1px solid var(--fline);transition:width .2s;overflow:hidden}
   :root:not([data-mode="dark"]) #side{background:rgba(244,248,252,.6)}
   #side .stop{display:flex;align-items:center;justify-content:space-between;margin:2px 4px 20px;min-height:32px}
   #side .slogo{font-weight:300;letter-spacing:.35em;font-size:16px;color:var(--logo);white-space:nowrap}
