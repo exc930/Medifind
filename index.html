@@ -79,6 +79,7 @@ button{font:inherit;cursor:pointer}
 .tog input:focus-visible + i{outline:3px solid var(--salmon);outline-offset:2px}
 .top-art.nofig{margin-bottom:0}
 .top-art.nofig .figure{display:none}
+
 .bar{display:flex;justify-content:flex-end;gap:8px}
 .pill{border:none;border-radius:999px;background:var(--card);color:var(--text);font-weight:600;font-size:.82rem;padding:8px 14px;box-shadow:0 4px 12px rgba(40,60,90,.18)}
 .brand{text-align:center;margin-top:-4px}
@@ -1398,6 +1399,7 @@ function arrange() {   // previous page on the left, current in the middle, next
     if (v === "listView" && was && !pane.hidden) pane.scrollTop = scrollY;   // list comes back where you left it
     pane.style.order = v === pv ? 0 : v === CUR ? 1 : 2;
   }
+  if (CUR === "listView") requestAnimationFrame(() => typeof centerHome === "function" && centerHome());
   quiet = true; pager.scrollLeft = $(PANE[CUR]).offsetLeft;
   requestAnimationFrame(() => { pager.scrollLeft = $(PANE[CUR]).offsetLeft; quiet = false; });
 }
@@ -1434,6 +1436,7 @@ function renderRecent() {
   RECENT = RECENT.filter(id => med(id));
   $("recent").hidden = !RECENT.length;
   const clock = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`;
+  requestAnimationFrame(() => typeof centerHome === "function" && centerHome());
   $("recList").innerHTML = RECENT.map(id => `<button type="button" data-id="${esc(id)}">${clock}<span>${esc(med(id).title)}</span></button>`).join("");
 }
 function noteRecent(id) {
@@ -1620,6 +1623,17 @@ for (const k of ["ms", "ds"]) $("fx-" + k).addEventListener("input", e => { FX[f
 document.querySelectorAll(".fxreset").forEach(b => b.onclick = () => { delete FX[fxKey(b.dataset.r)]; applyFX(true); });
 WIDEQ.addEventListener("change", syncSliders);
 applyFX(false);
+function centerHome() {   // phone, body art off: logo + search card sit in the middle, and stay put when Recently viewed comes or goes
+  const box = document.querySelector("#listView > div");
+  if (WIDEQ.matches || !$("topArt").classList.contains("nofig") || !$("listPane").offsetParent) { box.style.paddingTop = ""; return; }
+  box.style.paddingTop = "0px";
+  const top = $("topArt").getBoundingClientRect().top + $("listPane").scrollTop, hero = document.querySelector("#listView .hero").getBoundingClientRect();
+  const rec = $("recent"), recH = rec.hidden ? 0 : rec.getBoundingClientRect().height + 12;
+  const base = hero.bottom + $("listPane").scrollTop - top - recH, avail = $("tabbar").getBoundingClientRect().top - top;
+  box.style.paddingTop = Math.max(0, Math.round((avail - base) / 2)) + "px";
+}
+addEventListener("fxchange", () => requestAnimationFrame(centerHome)); addEventListener("resize", centerHome); addEventListener("layoutchange", centerHome);
+requestAnimationFrame(centerHome);
 $("opt-preg").checked = SHOWPREG;
 renderKeyChks();
 $("keyChks").addEventListener("change", e => {
@@ -1833,8 +1847,11 @@ $("imp").onchange = async e => {
   let C = CL;
   const BEAT = 700, SWEEP = BEAT * 4;   // the trace crosses the screen once every 4 beats, so every spike lands on a heartbeat
   let W, H, s, ox, oy, dpr, E0 = 0, EW = 1;
+  let lastFW = -1;
   function layout() {
     const FW = fig.clientWidth, L = fig.getBoundingClientRect().left;   // canvas spans the whole screen width
+    if (!FW) return;   // the home page is hidden (e.g. Settings is open): size it when it shows again
+    lastFW = FW;
     W = document.documentElement.clientWidth; cv.style.left = -L + "px"; cv.style.width = W + "px";
     s = Math.min(FW * .96, 360) / 300; ox = L + (FW - 300 * s) / 2; oy = 4;
     H = Math.round(oy + 232 * s); fig.style.height = H + "px";
@@ -1894,6 +1911,7 @@ $("imp").onchange = async e => {
     }
   }
   function loop(t) { draw(t); requestAnimationFrame(loop); }
+  if (window.ResizeObserver) new ResizeObserver(() => { if (fig.clientWidth && fig.clientWidth !== lastFW) layout(); }).observe(fig);   // redo the size once the home page is visible again
   layout(); addEventListener("resize", layout); addEventListener("layoutchange", layout); addEventListener("modechange", () => { if (still) draw(0); });
   addEventListener("fxchange", () => { if (FX.body || FX.ekg) { layout(); if (still) draw(0); } });
   if (still) heartImg.onload = () => draw(0); else requestAnimationFrame(loop);
