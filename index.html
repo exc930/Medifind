@@ -275,7 +275,7 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
   #pager{left:var(--sidew)!important;top:var(--toph)!important;transition:left .2s}
   .pane .wrap{max-width:1120px!important;padding-top:28px!important;padding-bottom:60px!important;padding-left:32px;padding-right:32px}
   #editPane .wrap,#setPane .wrap,#ixPane .wrap,#minePane .wrap{max-width:860px!important}
-  .toast{bottom:28px!important}
+  body .toast{bottom:20px!important;left:calc(var(--sidew) + (100vw - var(--sidew)) / 2)}
   #topArt,#listView .hero,#listView .sec-bar,#listView .list,#listView .bar{display:none!important}
   .dash{display:block}
   .dash h2{margin:0;font-size:1.7rem}.dash .sub{color:var(--sub);margin:4px 0 20px}
@@ -305,6 +305,16 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
   #bgroups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
   #bgroups .grp:has(.grp-head[aria-expanded="true"]){grid-column:1/-1}
 }
+/* background size sliders */
+.fxsl{display:flex;flex-direction:column;gap:6px}
+.fxsl .fxh{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:600}
+.fxsl .fxh span{flex:1}.fxsl .fxh b{color:var(--teal-txt);font-size:.85rem;min-width:40px;text-align:right}
+.fxreset{border:0;background:none;color:var(--sub);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;padding:2px 0 2px 6px}
+.fxsl input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;padding:0;margin:0;border:0;background:none;cursor:pointer}
+.fxsl input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--teal) var(--p,30%),var(--fline) var(--p,30%))}
+.fxsl input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--teal) var(--p,30%),var(--fline) var(--p,30%))}
+.fxsl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;margin-top:-9px;border-radius:50%;background:#fff;border:0;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.fxsl input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:0;box-shadow:0 1px 4px rgba(0,0,0,.35)}
 /* bottom tab bar: floating, solid */
 .tbblur{position:fixed;left:0;right:0;bottom:0;height:calc(100px + env(safe-area-inset-bottom,0px));z-index:47;pointer-events:none;
   -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);background:color-mix(in srgb,var(--sky2) 35%,transparent);
@@ -319,6 +329,7 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
 .tabbar .add .i{width:42px;height:42px;border-radius:50%;background:linear-gradient(160deg,var(--coral),var(--salmon));color:#fff;margin-top:-4px;box-shadow:0 6px 14px rgba(200,70,50,.4)}
 .tabbar .add.on .i{width:42px;border-radius:50%;background:linear-gradient(160deg,var(--coral),var(--salmon))}
 .tabbar .pill svg{width:28px;height:28px;color:var(--ink);filter:drop-shadow(0 1px 3px var(--shadow))}
+.tabbar button.pill{box-shadow:none;border-radius:0;font-weight:inherit;font-size:inherit}   /* the Settings tab is not a "pill" button */
 .tabbar .pill.spin svg{animation:spin .6s ease-in-out}
 .tabbar .tbadge{position:absolute;top:-4px;right:-6px;min-width:17px;height:17px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:var(--teal);color:#fff;font-size:.62rem;font-weight:800;display:grid;place-items:center;border:2px solid var(--sky1)}
 .pane .wrap{padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))!important}
@@ -446,9 +457,21 @@ form select{background-color:var(--field)}
 .btn{border:none;border-radius:999px;background:var(--coral);color:#fff;font-weight:700;padding:11px 20px;box-shadow:0 4px 14px rgba(201,71,47,.4)}
 .btn2{border:1px solid var(--b2line);border-radius:999px;background:transparent;color:var(--text);font-weight:600;padding:10px 18px;font-size:.9rem}
 .danger{color:var(--salmon)}
-.toast.wide{left:16px;right:16px;transform:none;display:flex;align-items:center;gap:12px;border-radius:14px;padding:12px 14px 12px 18px}
-.toast span{flex:1}.toast button{border:0;background:none;color:#7fd6e0;font:inherit;font-weight:800;letter-spacing:.06em;padding:4px 6px;cursor:pointer}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--card2);color:var(--sky2);padding:10px 20px;border-radius:999px;font-weight:600;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+/* little "liquid glass" message bubble (like iPhone), with an Undo pill when something can be undone */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:60;
+  display:flex;align-items:center;gap:10px;max-width:min(360px,calc(100vw - 32px));width:max-content;box-sizing:border-box;
+  padding:9px 16px;border-radius:999px;font-weight:600;font-size:.88rem;color:var(--text);
+  background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.07));
+  -webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);
+  border:1px solid rgba(255,255,255,.28);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(255,255,255,.08),0 10px 28px rgba(0,0,0,.35);
+  animation:toastIn .28s cubic-bezier(.2,.9,.3,1.3)}
+:root:not([data-mode="dark"]) .toast{background:linear-gradient(180deg,rgba(255,255,255,.78),rgba(255,255,255,.5));border-color:rgba(255,255,255,.9);box-shadow:inset 0 1px 0 #fff,0 10px 28px rgba(30,50,80,.22)}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,12px) scale(.94)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+.toast.wide{padding:6px 6px 6px 16px}
+.toast span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toast button{flex:none;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:6px 13px;font:inherit;font-size:.8rem;font-weight:800;letter-spacing:.04em;cursor:pointer;
+  color:#fff;background:linear-gradient(160deg,var(--coral),var(--salmon));box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 3px 10px rgba(255,90,74,.35)}
 
 /* Motion */
 @media (prefers-reduced-motion:no-preference){
@@ -554,8 +577,10 @@ form select{background-color:var(--field)}
           <label class="tog" for="fx-body"><span>Body with beating heart</span><input type="checkbox" id="fx-body"><i></i></label>
           <label class="tog" for="fx-ekg"><span>Heartbeat line</span><input type="checkbox" id="fx-ekg"><i></i></label>
           <label class="tog" for="fx-dna"><span>DNA helix</span><input type="checkbox" id="fx-dna"><i></i></label>
+          <div class="fxsl" id="fxsl-ds"><div class="fxh"><span>DNA size</span><b id="fx-dsv"></b><button type="button" class="fxreset" data-r="ds">Reset</button></div><input type="range" id="fx-ds" min="0.5" max="8" step="0.25" aria-label="DNA size"></div>
           <span class="fine">Floating in the background</span>
           <div class="seg" id="floatSeg" role="group" aria-label="Floating in the background"><button type="button" data-f="none">None</button><button type="button" data-f="specks">Specks</button><button type="button" data-f="molecules">Molecules</button><button type="button" data-f="color">Colorful</button></div>
+          <div class="fxsl" id="fxsl-ms"><div class="fxh"><span>Molecule size</span><b id="fx-msv"></b><button type="button" class="fxreset" data-r="ms">Reset</button></div><input type="range" id="fx-ms" min="0.5" max="4" step="0.25" aria-label="Molecule size"></div>
           <button class="btn2" id="fx-plain" type="button" style="align-self:flex-start">Plain background (turn all off)</button>
   <div id="bk">
           <div style="display:flex;flex-direction:column;gap:12px">
@@ -1332,9 +1357,9 @@ $("reset").onclick = () => {
 let tt;
 function toast(msg, undo) {   // short message; with undo it gets an UNDO button and stays 5 seconds
   const t = $("toast"); t.classList.toggle("wide", !!undo);
-  t.innerHTML = `<span>${esc(msg)}</span>` + (undo ? `<button type="button">UNDO</button>` : "");
+  t.innerHTML = `<span>${esc(msg)}</span>` + (undo ? `<button type="button">Undo</button>` : "");
   t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, undo ? 5000 : 1800);
-  if (undo) t.querySelector("button").onclick = () => { t.hidden = true; clearTimeout(tt); undo(); toast("Undone"); };
+  if (undo) t.querySelector("button").onclick = () => { t.hidden = true; clearTimeout(tt); undo(); };
 }
 
 // ---------- Navigation: pages side by side, swiped natively; phone history kept in step ----------
@@ -1568,7 +1593,20 @@ document.querySelectorAll("#modeSeg button").forEach(b => b.onclick = () => setM
 // background choices, remembered on this phone
 const FX = { body: true, ekg: true, dna: true, float: "molecules" };
 try { Object.assign(FX, JSON.parse(localStorage.getItem("medifind-fx")) || {}); } catch (e) {}
+const WIDEQ = matchMedia("(min-width: 900px)");
+const fxKey = k => k + (WIDEQ.matches ? "W" : "P");   // phone and computer each keep their own size
+const FXDEF = { ms: () => WIDEQ.matches ? 1.5 : 1, ds: () => WIDEQ.matches ? 5 : 1 };
+const fxSize = k => +(FX[fxKey(k)] ?? FXDEF[k]());
+function syncSliders() {
+  for (const k of ["ms", "ds"]) {
+    const el = $("fx-" + k), v = fxSize(k); el.value = v;
+    el.style.setProperty("--p", ((v - el.min) / (el.max - el.min) * 100) + "%");
+    $("fx-" + k + "v").textContent = (Math.round(v * 100) / 100) + "×";
+  }
+  $("fxsl-ds").hidden = !FX.dna; $("fxsl-ms").hidden = FX.float === "none";
+}
 function applyFX(save) {
+  syncSliders();
   $("fx-body").checked = FX.body; $("fx-ekg").checked = FX.ekg; $("fx-dna").checked = FX.dna;
   document.querySelectorAll("#floatSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === FX.float));
   $("topArt").classList.toggle("nofig", !FX.body && !FX.ekg);
@@ -1578,6 +1616,9 @@ function applyFX(save) {
 ["body", "ekg", "dna"].forEach(k => $("fx-" + k).onchange = e => { FX[k] = e.target.checked; applyFX(true); });
 document.querySelectorAll("#floatSeg button").forEach(b => b.onclick = () => { FX.float = b.dataset.f; applyFX(true); });
 $("fx-plain").onclick = () => { Object.assign(FX, { body: false, ekg: false, dna: false, float: "none" }); applyFX(true); };
+for (const k of ["ms", "ds"]) $("fx-" + k).addEventListener("input", e => { FX[fxKey(k)] = +e.target.value; applyFX(true); });
+document.querySelectorAll(".fxreset").forEach(b => b.onclick = () => { delete FX[fxKey(b.dataset.r)]; applyFX(true); });
+WIDEQ.addEventListener("change", syncSliders);
 applyFX(false);
 $("opt-preg").checked = SHOWPREG;
 renderKeyChks();
@@ -1680,7 +1721,7 @@ $("imp").onchange = async e => {
   }
   function drawDNA(t) {   // spins around its own axis: beads stay at their height and swing side to side, front side larger and brighter
     const mode = document.documentElement.dataset.mode === "dark" ? "dark" : "light", C = DNA_COL[mode];
-    const S = WIDE() ? 5 : 1, ST = 8 * S;   // on computers the helix is drawn 5x larger
+    const S = fxSize("ds"), ST = 8 * S;   // DNA size from Settings (computers start at 5x)
     const cx = W - 30 * S, AMP = 16 * S, TURN = 240 * S / (2 * Math.PI), OFF = 2.3, ph = still ? 0 : (t / 12000) * 2 * Math.PI;   // one turn every 12 s
     const pt = (y, sg) => { const a = y / TURN + ph + (sg > 0 ? 0 : OFF), z = Math.cos(a); return [cx + Math.sin(a) * AMP * (1 + .18 * z), z]; };
     const lit = z => (z + 1) / 2;
@@ -1715,7 +1756,7 @@ $("imp").onchange = async e => {
   function size() {
     dpr = Math.min(devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight;
     cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    dots = Array.from({ length: Math.round(W * H / 6200) }, () => newMol(Math.random() * W, Math.random() * H));
+    dots = Array.from({ length: Math.round(W * H / 3100) }, () => newMol(Math.random() * W, Math.random() * H));   // a spare pool; how many show depends on the molecule size
   }
   function frame(t) {
     ctx.clearRect(0, 0, W, H);
@@ -1723,8 +1764,8 @@ $("imp").onchange = async e => {
     const dark = document.documentElement.dataset.mode === "dark";
     const web = WIDE(), SW = web ? parseFloat(getComputedStyle(document.body).getPropertyValue("--sidew")) || 232 : W;   // computers: molecules only in the sidebar
     if (web) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, SW, H); ctx.clip(); }
-    MSC = web ? 1.5 : 1;
-    if (FX.float !== "none") for (const d of (web ? dots.slice(0, Math.max(5, Math.round(SW * H / 6500))) : dots)) {
+    MSC = fxSize("ms");
+    if (FX.float !== "none") for (const d of dots.slice(0, Math.max(5, Math.round(web ? SW * H / 6500 * 1.5 / MSC : W * H / 6200 / MSC)))) {
       if (!still) {
         d.x += d.vx; d.y += d.vy; d.ax += d.wx; d.ay += d.wy;
         if (d.y < -20) Object.assign(d, newMol(Math.random() * SW, H + 20));
