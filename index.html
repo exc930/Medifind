@@ -304,8 +304,8 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
   /* medicine: Key info on the left, More info on the right */
   #card .detail{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;align-items:start}
   #card .detail > .dhead,#card .detail > .fine{grid-column:1/-1}
-  #card .detail > .usedfor,#card .detail > .btnrow,#card .detail > .minenote,#card .detail > .kcol{grid-column:1}
-  #card .detail > .mcol{grid-column:2;grid-row:2/span 4}
+  #card .detail > .usedfor,#card .detail > .bwarn,#card .detail > .btnrow,#card .detail > .minenote,#card .detail > .kcol,#card .detail > .offlink{grid-column:1}
+  #card .detail > .mcol{grid-column:2;grid-row:2/span 6}
   #card .detail > .mcol .klbl:first-child{margin-top:14px}
   #bgroups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
   #bgroups .grp:has(.grp-head[aria-expanded="true"]){grid-column:1/-1}
@@ -320,6 +320,16 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
 .fxsl input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--teal) var(--p,30%),var(--fline) var(--p,30%))}
 .fxsl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;margin-top:-9px;border-radius:50%;background:#fff;border:0;box-shadow:0 1px 4px rgba(0,0,0,.35)}
 .fxsl input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:0;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+/* official FDA info on medicine cards */
+.bwarn{border:1.5px solid #e0583f;border-radius:14px;background:rgba(224,88,63,.1);padding:10px 14px}
+.bwarn summary{list-style:none;cursor:pointer;display:flex;flex-direction:column;gap:3px}.bwarn summary::-webkit-details-marker{display:none}
+.bwarn b{color:#f08a74;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase}
+.bwarn summary span{font-size:.88rem;color:var(--text);line-height:1.4}
+.bwarn[open] summary span{display:none}.bwarn p{margin:4px 0 0;font-size:.88rem;line-height:1.45;white-space:pre-line}
+.offlink{display:flex;align-items:center;gap:12px;border:1px solid var(--fline);border-radius:14px;padding:12px 14px;margin-top:14px;color:var(--text);text-decoration:none;background:var(--field)}
+.offlink .oi{flex:none;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:#1f4e8a;color:#fff;font-weight:800;font-size:.72rem;letter-spacing:.06em}
+.offlink .ot{flex:1;min-width:0}.offlink b{display:block}.offlink small{display:block;color:var(--sub);font-size:.8rem}
+.offlink em{font-style:normal;color:#f3c85a;font-weight:700}
 /* bottom tab bar: floating, solid */
 .tbblur{position:fixed;left:0;right:0;bottom:0;height:calc(100px + env(safe-area-inset-bottom,0px));z-index:47;pointer-events:none;
   -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);background:color-mix(in srgb,var(--sky2) 35%,transparent);
@@ -572,6 +582,8 @@ form select{background-color:var(--field)}
           <div class="seg" id="modeSeg" role="group" aria-label="Appearance"><button type="button" data-mode="light">Light</button><button type="button" data-mode="dark">Dark</button></div>
           <b style="margin-top:6px">Information</b>
           <label class="tog" for="opt-preg"><span>Show pregnancy info</span><input type="checkbox" id="opt-preg"><i></i></label>
+          <b style="margin-top:6px">Official FDA info</b>
+          <span class="fine" id="offInfo" style="margin-top:-6px"></span>
           <b style="margin-top:6px">Key info on medicine cards</b>
           <span class="fine" style="margin-top:-6px">Checked items show open at the top of every medicine. The rest go under More info.</span>
           <div class="kchks" id="keyChks"></div>
@@ -1142,6 +1154,36 @@ function cardSections(m, others, list, cnt) {   // in order of importance; check
 function renderKeyChks() {
   $("keyChks").innerHTML = KEYS.map(([k, l]) => `<label class="kchk"><input type="checkbox" data-k="${k}"${KEYON.has(k) ? " checked" : ""}><span class="box"></span><span>${l}</span></label>`).join("");
 }
+// ---------- Official FDA label info (refreshed automatically on GitHub every week) ----------
+let OFFICIAL = null;
+try { OFFICIAL = JSON.parse(localStorage.getItem("medifind-official")); } catch (e) {}
+(async () => {
+  for (const url of ["https://raw.githubusercontent.com/exc930/medifind/main/official.json", "official.json"]) {
+    try {
+      const r = await fetch(url + "?t=" + Date.now()); if (!r.ok) continue;
+      const j = await r.json(); if (!j || !j.labels) continue;
+      OFFICIAL = j; try { localStorage.setItem("medifind-official", JSON.stringify(j)); } catch (e) {}
+      if (current && CUR === "cardView") openCard(current, undefined, true);
+      offInfo(); return;
+    } catch (e) {}
+  }
+})();
+const fdaDate = d => d && d.length >= 8 ? new Date(+d.slice(0, 4), +d.slice(4, 6) - 1, +d.slice(6, 8)).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "";
+function offInfo() {
+  const el = $("offInfo"); if (!el) return;
+  const n = OFFICIAL ? Object.keys(OFFICIAL.labels || {}).length : 0;
+  el.textContent = OFFICIAL && OFFICIAL.updated ? `Last checked ${fdaDate(OFFICIAL.updated)} · ${n.toLocaleString()} medicines matched to an FDA label` : "Not checked yet. GitHub checks the FDA every week once the updater is set up.";
+}
+function officialHTML(m) {   // boxed warning + link to the official label
+  if (m.custom) return { warn: "", link: "" };
+  const L = OFFICIAL && OFFICIAL.labels && OFFICIAL.labels[m.generic];
+  const first = m.generic.split(";")[0].trim();
+  const url = L && L.s ? `https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=${encodeURIComponent(L.s)}` : `https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=${encodeURIComponent(first)}`;
+  const recent = L && L.u && (Date.now() - new Date(+L.u.slice(0, 4), +L.u.slice(4, 6) - 1, +L.u.slice(6, 8))) < 90 * 864e5;
+  const warn = L && L.b ? `<details class="bwarn"${L.b.length < 220 ? " open" : ""}><summary><b>FDA boxed warning</b><span>${esc(L.b.slice(0, 140))}${L.b.length > 140 ? "…" : ""}</span></summary><p>${esc(L.b)}</p></details>` : "";
+  const link = `<a class="offlink" href="${url}" target="_blank" rel="noopener"><span class="oi">FDA</span><span class="ot"><b>Official FDA label</b><small>${L && L.d ? "Label updated " + fdaDate(L.d) : "Opens DailyMed (U.S. National Library of Medicine)"}${recent ? ` · <em>Recently changed</em>` : ""}</small></span>›</a>`;
+  return { warn, link };
+}
 function openCard(id, name, prep) {
   const m = med(id); if (!m) return;
   if (CUR === "listView") scrollY = $("listPane").scrollTop;
@@ -1152,14 +1194,17 @@ function openCard(id, name, prep) {
   const acc = (title, meta, body) => `<details class="acc"><summary><h3>${title}</h3><span class="meta">${meta}</span>${chev}</summary><div class="body">${body}</div></details>`;
   const list = (arr, empty = "Not filled in yet") => arr.length ? `<ul>${arr.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<div class="none">${empty}</div>`;
   const cnt = arr => arr.length ? arr.length : "Empty";
+  const off = officialHTML(m);
   $("card").innerHTML = `<div class="card detail">
     <div class="dhead">${tile}<div><h2>${esc(m.title)}</h2><div class="gen">${m.kind === "b" ? esc(fmtGen(m.generic)) : "Generic"}</div>
       ${m.variants.length ? `<div class="aka">Also sold as: ${esc(m.variants.join(", "))}</div>` : ""}
       ${m.old.length ? `<div class="aka">${m.kind === "b" ? "Formerly" : "Brand"}: ${esc(m.old.join(", "))}</div>` : ""}</div></div>
     <div class="usedfor"><h3>Used for</h3>${list(m.uses)}</div>
+    ${off.warn}
     <div class="btnrow"><button class="btn2 ixgo" type="button">Check interactions</button><button class="btn2 minego${m.id in MINE ? " in" : ""}" type="button">${m.id in MINE ? "✓ My Meds" : "+ My Meds"}</button></div>
     ${m.id in MINE && MINE[m.id] ? `<button type="button" class="minenote minego"><span>Note:</span> ${esc(MINE[m.id])} <b>Edit</b></button>` : ""}
     ${cardSections(m, others, list, cnt)}
+    ${off.link}
     <p class="fine">Personal reference only.${SHOWPREG ? " Pregnancy scores are your own 1–10 scale, not an official FDA rating." : ""}${schedOf(m) ? " Law summaries are for reference, not legal advice." : ""}</p>
   </div>`;
   if (!prep) { $("cardPane").scrollTop = 0; show("cardView"); }
@@ -1371,7 +1416,7 @@ function paint(st) {   // fill a page with its content without moving to it
   if (st.v === "card" && med(st.id)) return openCard(st.id, st.name, true), true;
   if (st.v === "edit" && (st.id === null || med(st.id))) return openEdit(st.id, true), true;
   if (st.v === "ix") return renderIx(), true;
-  if (st.v === "set") return bkInfo(), true;
+  if (st.v === "set") return bkInfo(), offInfo(), true;
   if (st.v === "br") return setBrowse(st.s || "rx"), true;
   if (st.v === "mine") return renderMine(), true;
   renderList(); return st.v === "list";
