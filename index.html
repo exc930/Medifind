@@ -214,7 +214,12 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
 .acc summary .t{flex:1;min-width:0}.acc summary .t h3{flex:none}
 .acc[open] .pk{display:none}
 /* My Meds */
-.btnrow{display:flex;gap:8px;margin-top:4px}.btnrow > *{flex:1;min-width:0;margin:0!important;white-space:nowrap;font-size:.86rem;padding-left:8px;padding-right:8px}
+.btnrow{display:flex;gap:8px;margin-top:4px}.btnrow > .btn2{min-width:0;margin:0!important;white-space:nowrap;font-size:.86rem;padding-left:14px;padding-right:14px;text-overflow:clip}
+.btnrow .ixgo{flex:1.4 1 auto}.btnrow .minego{flex:1 1 auto}
+.minenote{display:block;width:100%;margin-top:8px;border:0;background:none;text-align:left;font:inherit;font-size:.88rem;color:var(--text);padding:2px 4px;cursor:pointer;line-height:1.35}
+.minenote.minego{white-space:normal;overflow:visible;text-overflow:clip}
+@media (max-width:380px){ .btnrow > .btn2{font-size:.8rem;padding-left:10px;padding-right:10px} }
+.minenote span{color:var(--sub)}.minenote b{color:var(--teal-txt);font-size:.8rem;margin-left:4px}
 .minego{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .minego.in{background:var(--chipbg);color:var(--teal-txt);border-color:var(--teal)}
 .mseg{display:flex;background:var(--field);border:1px solid var(--fline);border-radius:12px;padding:3px;margin-top:12px}
@@ -297,11 +302,10 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
   .dchips{display:flex;flex-wrap:wrap;gap:8px}
   .dchips button{border:1px solid var(--fline);background:var(--field);color:var(--text);border-radius:999px;padding:7px 13px;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer}
   /* medicine: Key info on the left, More info on the right */
-  label[for="fx-body"],label[for="fx-ekg"]{display:none!important}   /* the body and heartbeat art is off on computers, so those switches are hidden there */
   #card .detail{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;align-items:start}
   #card .detail > .dhead,#card .detail > .fine{grid-column:1/-1}
-  #card .detail > .usedfor,#card .detail > .btnrow,#card .detail > .kcol{grid-column:1}
-  #card .detail > .mcol{grid-column:2;grid-row:2/span 3}
+  #card .detail > .usedfor,#card .detail > .btnrow,#card .detail > .minenote,#card .detail > .kcol{grid-column:1}
+  #card .detail > .mcol{grid-column:2;grid-row:2/span 4}
   #card .detail > .mcol .klbl:first-child{margin-top:14px}
   #bgroups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
   #bgroups .grp:has(.grp-head[aria-expanded="true"]){grid-column:1/-1}
@@ -507,9 +511,6 @@ form select{background-color:var(--field)}
         <div class="brand">
           <div class="logo">MEDIFIND</div>
         </div>
-        <div class="figure" id="figure" aria-hidden="true">
-          <canvas id="torso"></canvas>
-        </div>
       </div>
 
       <div class="card hero">
@@ -575,8 +576,6 @@ form select{background-color:var(--field)}
           <span class="fine" style="margin-top:-6px">Checked items show open at the top of every medicine. The rest go under More info.</span>
           <div class="kchks" id="keyChks"></div>
           <b style="margin-top:6px">Background</b>
-          <label class="tog" for="fx-body"><span>Body with beating heart</span><input type="checkbox" id="fx-body"><i></i></label>
-          <label class="tog" for="fx-ekg"><span>Heartbeat line</span><input type="checkbox" id="fx-ekg"><i></i></label>
           <label class="tog" for="fx-dna"><span>DNA helix</span><input type="checkbox" id="fx-dna"><i></i></label>
           <div class="fxsl" id="fxsl-ds"><div class="fxh"><span>DNA size</span><b id="fx-dsv"></b><button type="button" class="fxreset" data-r="ds">Reset</button></div><input type="range" id="fx-ds" min="0.5" max="8" step="0.25" aria-label="DNA size"></div>
           <span class="fine">Floating in the background</span>
@@ -1158,7 +1157,8 @@ function openCard(id, name, prep) {
       ${m.variants.length ? `<div class="aka">Also sold as: ${esc(m.variants.join(", "))}</div>` : ""}
       ${m.old.length ? `<div class="aka">${m.kind === "b" ? "Formerly" : "Brand"}: ${esc(m.old.join(", "))}</div>` : ""}</div></div>
     <div class="usedfor"><h3>Used for</h3>${list(m.uses)}</div>
-    <div class="btnrow"><button class="btn2 ixgo" type="button">Check interactions</button><button class="btn2 minego${m.id in MINE ? " in" : ""}" type="button">${m.id in MINE ? "✓ My Meds" + (MINE[m.id] ? " · " + esc(MINE[m.id]) : "") : "+ My Meds"}</button></div>
+    <div class="btnrow"><button class="btn2 ixgo" type="button">Check interactions</button><button class="btn2 minego${m.id in MINE ? " in" : ""}" type="button">${m.id in MINE ? "✓ My Meds" : "+ My Meds"}</button></div>
+    ${m.id in MINE && MINE[m.id] ? `<button type="button" class="minenote minego"><span>Note:</span> ${esc(MINE[m.id])} <b>Edit</b></button>` : ""}
     ${cardSections(m, others, list, cnt)}
     <p class="fine">Personal reference only.${SHOWPREG ? " Pregnancy scores are your own 1–10 scale, not an official FDA rating." : ""}${schedOf(m) ? " Law summaries are for reference, not legal advice." : ""}</p>
   </div>`;
@@ -1594,7 +1594,7 @@ $("tabbar").addEventListener("click", e => {
 });
 document.querySelectorAll("#modeSeg button").forEach(b => b.onclick = () => setMode(b.dataset.mode));
 // background choices, remembered on this phone
-const FX = { body: true, ekg: true, dna: true, float: "molecules" };
+const FX = { dna: true, float: "molecules" };
 try { Object.assign(FX, JSON.parse(localStorage.getItem("medifind-fx")) || {}); } catch (e) {}
 const WIDEQ = matchMedia("(min-width: 900px)");
 const fxKey = k => k + (WIDEQ.matches ? "W" : "P");   // phone and computer each keep their own size
@@ -1610,15 +1610,15 @@ function syncSliders() {
 }
 function applyFX(save) {
   syncSliders();
-  $("fx-body").checked = FX.body; $("fx-ekg").checked = FX.ekg; $("fx-dna").checked = FX.dna;
+  $("fx-dna").checked = FX.dna;
   document.querySelectorAll("#floatSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === FX.float));
-  $("topArt").classList.toggle("nofig", !FX.body && !FX.ekg);
+  $("topArt").classList.add("nofig");   // the body/heart/heartbeat art was removed: Home is always the centered logo + search
   if (save) try { localStorage.setItem("medifind-fx", JSON.stringify(FX)); } catch (e) {}
   dispatchEvent(new Event("fxchange"));
 }
-["body", "ekg", "dna"].forEach(k => $("fx-" + k).onchange = e => { FX[k] = e.target.checked; applyFX(true); });
+["dna"].forEach(k => $("fx-" + k).onchange = e => { FX[k] = e.target.checked; applyFX(true); });
 document.querySelectorAll("#floatSeg button").forEach(b => b.onclick = () => { FX.float = b.dataset.f; applyFX(true); });
-$("fx-plain").onclick = () => { Object.assign(FX, { body: false, ekg: false, dna: false, float: "none" }); applyFX(true); };
+$("fx-plain").onclick = () => { Object.assign(FX, { dna: false, float: "none" }); applyFX(true); };
 for (const k of ["ms", "ds"]) $("fx-" + k).addEventListener("input", e => { FX[fxKey(k)] = +e.target.value; applyFX(true); });
 document.querySelectorAll(".fxreset").forEach(b => b.onclick = () => { delete FX[fxKey(b.dataset.r)]; applyFX(true); });
 WIDEQ.addEventListener("change", syncSliders);
@@ -1799,123 +1799,7 @@ $("imp").onchange = async e => {
   size(); addEventListener("resize", size); addEventListener("modechange", () => { if (still) frame(0); }); requestAnimationFrame(frame);
 })();
 
-// ---------- Wireframe torso, beating heart and heartbeat line ----------
-(() => {
-  const fig = $("figure"), cv = $("torso"), ctx = cv.getContext("2d");
-  let dark = false;
-  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const heartImg = new Image(); heartImg.src = "heart.png";   // 7 frames, 180 x 274 each
-  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  // Body shape in a 300 x 250 box: outer contour (left side, mirrored) plus arm and torso-side lines
-  const outer = [[124,0],[123,22],[112,36],[88,46],[62,54],[44,66],[34,86],[30,112],[28,150],[26,195],[24,250]];
-  const armIn = [[56,104],[56,150],[55,200],[54,250]];
-  const side  = [[74,106],[78,150],[81,200],[83,250]];
-  const neckline = [[123,22],[134,32],[150,36],[166,32],[177,22]];
-  const mir = l => l.map(([x, y]) => [300 - x, y]);
-  const P = [], E = [], seen = new Set();
-  const link = (a, b) => { const k = a < b ? a + "-" + b : b + "-" + a; if (a !== b && !seen.has(k)) { seen.add(k); E.push([a, b]); } };
-  function contour(line, step, jit) {          // points along a line, joined in order
-    let prev = -1;
-    for (let i = 0; i < line.length - 1; i++) {
-      const [x1, y1] = line[i], [x2, y2] = line[i + 1], n = Math.max(1, Math.round(Math.hypot(x2 - x1, y2 - y1) / step));
-      for (let k = 0; k < n; k++) { const t = k / n; P.push([x1 + (x2 - x1) * t + (rnd() - .5) * jit, y1 + (y2 - y1) * t + (rnd() - .5) * jit]); if (prev >= 0) link(prev, P.length - 1); prev = P.length - 1; }
-    }
-    P.push(line[line.length - 1].slice()); link(prev, P.length - 1);
-  }
-  [outer, mir(outer)].forEach(l => contour(l, 9, 3));
-  [armIn, mir(armIn), side, mir(side)].forEach(l => contour(l, 12, 5));
-  contour(neckline, 8, 2);
-  // inner points: the shoulders and arms are dense, the chest is sparse so the heart stands out
-  const region = (x, y) => {
-    const xl = Math.min(x, 300 - x);
-    const ox = y < 22 ? 124 : y < 46 ? 124 - (y - 22) * 1.5 : y < 66 ? 88 - (y - 46) * 2.2 : y < 112 ? 44 - (y - 66) * .3 : 30 - (y - 112) * .04;
-    if (xl < ox) return 0;
-    if (y > 104 && xl > 56 && xl < 74) return 0;          // gap between arm and body
-    return xl < 74 && y > 104 ? 2 : (y < 70 ? 2 : 1);
-  };
-  for (let tries = 0; P.length < 260 && tries < 6000; tries++) {
-    const x = 24 + rnd() * 252, y = 2 + rnd() * 246, r = region(x, y);
-    if (!r) continue;
-    const xl = Math.min(x, 300 - x), chest = xl > 95 && y > 70;
-    if (r === 2 || (!chest && rnd() < .7) || rnd() < .16) P.push([x, y]);
-  }
-  P.forEach((p, i) => P.map((q, j) => [Math.hypot(p[0] - q[0], p[1] - q[1]), j]).filter(([d, j]) => j !== i && d < 30).sort((a, b) => a[0] - b[0]).slice(0, 3).forEach(([, j]) => link(i, j)));
-  const T = [];
-  E.forEach(([a, b]) => { for (const [c, d] of E) { const o = c === a ? d : d === a ? c : -1; if (o >= 0 && o !== b && seen.has(b < o ? b + "-" + o : o + "-" + b) && rnd() < .35) T.push([a, b, o]); } });
-  const ph = P.map(() => rnd() * 6.28);
-  const CD = { tri: "rgba(70,150,255,.08)", line: "rgba(90,190,255,.5)", dot: "#eaf8ff", glow: "rgba(80,190,255,.9)", ecg: "rgba(255,70,80,.55)", hot: "#ff4d5a" }, CL = { tri: "rgba(40,130,180,.07)", line: "rgba(30,115,160,.38)", dot: "#1f86b3", glow: "rgba(31,134,179,.5)", ecg: "rgba(201,71,47,.4)", hot: "#d23b2b" };
-  let C = CL;
-  const BEAT = 700, SWEEP = BEAT * 4;   // the trace crosses the screen once every 4 beats, so every spike lands on a heartbeat
-  let W, H, s, ox, oy, dpr, E0 = 0, EW = 1;
-  let lastFW = -1;
-  function layout() {
-    const FW = fig.clientWidth, L = fig.getBoundingClientRect().left;   // canvas spans the whole screen width
-    if (!FW) return;   // the home page is hidden (e.g. Settings is open): size it when it shows again
-    lastFW = FW;
-    W = document.documentElement.clientWidth; cv.style.left = -L + "px"; cv.style.width = W + "px";
-    s = Math.min(FW * .96, 360) / 300; ox = L + (FW - 300 * s) / 2; oy = 4;
-    H = Math.round(oy + 232 * s); fig.style.height = H + "px";
-    EW = W >= 900 ? Math.min(W, 300 * s * 2.4, FW) : W; E0 = W >= 900 ? ox + 150 * s - EW / 2 : 0;   // wide windows: the line stays around the body
-    dpr = Math.min(devicePixelRatio || 1, 2); cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    if (still) draw(0);
-  }
-  function wave(f) {   // one heartbeat (f = 0..1): P wave, QRS spike, T wave
-    if (f >= .10 && f < .18) return Math.sin(Math.PI * (f - .10) / .08) * .12;
-    if (f >= .25 && f < .27) return -.15 * (f - .25) / .02;
-    if (f >= .27 && f < .30) return -.15 + 1.15 * (f - .27) / .03;
-    if (f >= .30 && f < .33) return 1 - 1.35 * (f - .30) / .03;
-    if (f >= .33 && f < .35) return -.35 + .35 * (f - .33) / .02;
-    if (f >= .44 && f < .58) return Math.sin(Math.PI * (f - .44) / .14) * .25;
-    return 0;
-  }
-  function ecgPath(yE) {
-    const amp = 30 * s; ctx.beginPath();
-    for (let x = E0; x <= E0 + EW; x += 1) { const y = yE - wave((((x - E0) / EW) * 4) % 1) * amp; x > E0 ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
-  }
-  function draw(t) {
-    dark = document.documentElement.dataset.mode === "dark"; C = dark ? CD : CL;
-    ctx.clearRect(0, 0, W, H);
-    if (FX.body) {
-    const X = P.map(([x, y], i) => [ox + (x + Math.sin(t / 1400 + ph[i]) * 1.2) * s, oy + (y + Math.cos(t / 1700 + ph[i]) * 1.2) * s]);
-    ctx.fillStyle = C.tri;
-    for (const [a, b, c] of T) { ctx.beginPath(); ctx.moveTo(...X[a]); ctx.lineTo(...X[b]); ctx.lineTo(...X[c]); ctx.fill(); }
-    ctx.strokeStyle = C.line; ctx.lineWidth = .8; ctx.beginPath();
-    for (const [a, b] of E) { ctx.moveTo(...X[a]); ctx.lineTo(...X[b]); }
-    ctx.stroke();
-    ctx.shadowColor = C.glow; ctx.shadowBlur = dark ? 6 : 3; ctx.fillStyle = C.dot;
-    X.forEach(([x, y], i) => { ctx.globalAlpha = .5 + .5 * Math.sin(t / 650 + ph[i] * 3) ** 2; ctx.beginPath(); ctx.arc(x, y, 1.5, 0, 7); ctx.fill(); });
-    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
-    // heart: glow pulse, then the current frame of the beat (0.7 s per beat, 7 frames)
-    const beat = (t % BEAT) / BEAT, fi = Math.floor(beat * 7);
-    const hw = 58 * s, hh = hw * 274 / 180, hx = ox + 158 * s - hw / 2, hy = oy + 112 * s - hh / 2;
-    const pulse = beat < .3 ? beat / .3 : 1 - (beat - .3) / .7;
-    const gr = hw * (1.1 + .25 * pulse), gx = hx + hw / 2, gy = hy + hh * .55;
-    const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, gr);
-    g.addColorStop(0, `rgba(240,50,60,${.35 + .3 * pulse})`); g.addColorStop(1, "rgba(240,50,60,0)");
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(gx, gy, gr, 0, 7); ctx.fill();
-    if (heartImg.complete && heartImg.naturalWidth) {
-      ctx.shadowColor = "rgba(255,40,40,.7)"; ctx.shadowBlur = 10 + 8 * pulse;
-      ctx.drawImage(heartImg, fi * 180, 0, 180, 274, hx, hy, hw, hh); ctx.shadowBlur = 0;
-    }
-    }
-    if (!FX.ekg) return;
-    // heartbeat line through the chest
-    const yE = oy + 124 * s;
-    ctx.lineJoin = "round"; ctx.lineCap = "round";
-    
-    if (t) {
-      const head = E0 + ((t % SWEEP) / SWEEP) * EW, tail = EW / 4;   // the bright head is at the same point of the beat as the heart
-      ctx.save(); ctx.beginPath(); ctx.rect(head - tail, 0, tail + 2, H); ctx.clip();
-      const lg = ctx.createLinearGradient(head - tail, 0, head, 0); lg.addColorStop(0, "rgba(255,80,80,0)"); lg.addColorStop(1, C.hot);
-      ctx.strokeStyle = lg; ctx.lineWidth = 2.2; ctx.shadowColor = C.hot; ctx.shadowBlur = 8; ecgPath(yE); ctx.stroke(); ctx.restore();
-    }
-  }
-  function loop(t) { draw(t); requestAnimationFrame(loop); }
-  if (window.ResizeObserver) new ResizeObserver(() => { if (fig.clientWidth && fig.clientWidth !== lastFW) layout(); }).observe(fig);   // redo the size once the home page is visible again
-  layout(); addEventListener("resize", layout); addEventListener("layoutchange", layout); addEventListener("modechange", () => { if (still) draw(0); });
-  addEventListener("fxchange", () => { if (FX.body || FX.ekg) { layout(); if (still) draw(0); } });
-  if (still) heartImg.onload = () => draw(0); else requestAnimationFrame(loop);
-})();
+
 
 renderList();
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
