@@ -193,6 +193,43 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
 .sdd .r{display:block;color:var(--teal-txt);font-size:.78rem;margin-top:1px}
 .sdd .more{color:var(--sub);font-size:.8rem;text-align:center}
 .hero:has(.sdd:not([hidden])){z-index:41}
+/* medicine card: Key info box + More info rows */
+.kchks{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
+.kchk{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:.92rem;font-weight:600;cursor:pointer}
+.kchk input{appearance:none;-webkit-appearance:none;flex:none;width:22px;height:22px;margin:0;border-radius:7px;border:2px solid var(--fline);background:var(--field);display:grid;place-items:center;cursor:pointer}
+.kchk input:checked{background:var(--teal);border-color:var(--teal)}
+.kchk input:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.klbl{margin:16px 2px 6px;font-size:.64rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--sub)}
+.kbox{border:1px solid var(--fline);border-radius:14px;padding:12px 14px;background:var(--field)}
+.kbox .ks + .ks{border-top:1px solid var(--fline);margin-top:12px;padding-top:12px}
+.ks .kh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.ks .kh h3{margin:0;font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--salmon)}
+.ks .kh .meta{color:var(--sub);font-size:.8rem}
+.ks ul{margin:0}
+.acc .pk{display:block;color:var(--sub);font-size:.84rem;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0;text-transform:none;font-weight:500}
+.acc summary .t{flex:1;min-width:0}.acc summary .t h3{flex:none}
+.acc[open] .pk{display:none}
+/* My Meds */
+.btnrow{display:flex;gap:8px;margin-top:4px}.btnrow > *{flex:1;min-width:0;margin:0!important;white-space:nowrap;font-size:.86rem;padding-left:8px;padding-right:8px}
+.minego{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.minego.in{background:var(--chipbg);color:var(--teal-txt);border-color:var(--teal)}
+.mseg{display:flex;background:var(--field);border:1px solid var(--fline);border-radius:12px;padding:3px;margin-top:12px}
+.mseg button{flex:1;border:0;background:none;color:var(--sub);font:inherit;font-weight:700;font-size:.88rem;padding:8px 0;border-radius:9px;cursor:pointer}
+.mseg button[aria-pressed="true"]{background:var(--teal);color:#fff}
+.msheet .fs-body{padding-bottom:6px}
+.msheet .sdd{position:static;margin-top:8px;max-height:38vh;box-shadow:none}
+.msheet label.f{display:block;font-weight:700;font-size:.9rem;margin:14px 0 6px}
+.msheet .pick{display:flex;align-items:center;gap:10px;border:1px solid var(--fline);border-radius:12px;padding:10px 14px;background:var(--field)}
+.msheet .pick span{flex:1;min-width:0}.msheet .pick small{color:var(--sub)}
+.msheet .linkbtn{border:0;background:none;color:var(--teal-txt);font:inherit;font-weight:700;cursor:pointer;padding:6px 0}
+.msheet .create{display:block;margin:14px auto 4px;color:var(--sub)}
+.msheet .create b{color:var(--teal-txt)}
+.achoose{display:flex;flex-direction:column;gap:10px;padding:6px 0 4px}
+.achoose button{display:flex;align-items:center;gap:14px;text-align:left;border:1px solid var(--fline);background:var(--field);color:var(--text);border-radius:16px;padding:14px;font:inherit;cursor:pointer}
+.achoose b{display:block;font-size:1rem}.achoose small{display:block;color:var(--sub);font-size:.84rem;margin-top:2px;line-height:1.35}
+.achoose .ai{flex:none;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(160deg,var(--teal),var(--teal2));color:#fff}
+.achoose .ai.new{background:linear-gradient(160deg,var(--coral),var(--salmon))}.achoose svg{width:24px;height:24px}
+.msheet .fs-top h4{text-align:center}
 /* bottom tab bar: floating, solid */
 .tabbar{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:48;max-width:520px;margin:0 auto;display:flex;justify-content:space-around;align-items:center;padding:8px 6px;border-radius:26px;background:var(--sky1);border:1px solid var(--fline);box-shadow:0 10px 30px rgba(0,0,0,.3)}
 .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;color:var(--sub);font:inherit;padding:4px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;min-width:0}
@@ -275,8 +312,8 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
   body:not(.split) #list{max-width:760px;margin-left:auto;margin-right:auto}
   body.split #pager{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,460px) minmax(0,820px) minmax(0,1fr)}   /* list + medicine centered as a pair */
   body.split #listPane{grid-column:2;grid-row:1;border-right:1px solid var(--fline)}
-  body.split #cardPane,body.split #editPane,body.split #ixPane{grid-column:3;grid-row:1}
-  body.split #cardPane .wrap,body.split #editPane .wrap,body.split #ixPane .wrap{max-width:780px;margin:0 auto}
+  body.split #cardPane,body.split #editPane,body.split #ixPane,body.split #setPane,body.split #brPane,body.split #minePane{grid-column:3;grid-row:1}
+  body.split #cardPane .wrap,body.split #editPane .wrap,body.split #ixPane .wrap,body.split #setPane .wrap,body.split #brPane .wrap,body.split #minePane .wrap{max-width:780px;margin:0 auto}
 }
 @media (min-width:1200px){ body:not(.split) .sect-body{grid-template-columns:repeat(3,minmax(0,1fr))} }
 .aka{color:var(--sub);font-size:.78rem;margin-top:3px;line-height:1.35}
@@ -412,7 +449,7 @@ form select{background-color:var(--field)}
   <!-- My meds -->
   <div id="mineView" class="view">
     <div style="display:flex;flex-direction:column;gap:14px">
-      <div class="card hero"><h1>My meds</h1><p>Medicines you added or changed</p></div>
+      <div class="card hero"><h1>My Meds</h1><p>Your go-to medicines, with your own notes</p><div class="mseg" id="mineSeg" hidden><button type="button" data-s="note">By note</button><button type="button" data-s="az">A–Z</button></div></div>
       <div class="list" id="mineList"></div>
     </div>
   </div>
@@ -428,6 +465,9 @@ form select{background-color:var(--field)}
           <div class="seg" id="modeSeg" role="group" aria-label="Appearance"><button type="button" data-mode="light">Light</button><button type="button" data-mode="dark">Dark</button></div>
           <b style="margin-top:6px">Information</b>
           <label class="tog" for="opt-preg"><span>Show pregnancy info</span><input type="checkbox" id="opt-preg"><i></i></label>
+          <b style="margin-top:6px">Key info on medicine cards</b>
+          <span class="fine" style="margin-top:-6px">Checked items show open at the top of every medicine. The rest go under More info.</span>
+          <div class="kchks" id="keyChks"></div>
           <b style="margin-top:6px">Background</b>
           <label class="tog" for="fx-body"><span>Body with beating heart</span><input type="checkbox" id="fx-body"><i></i></label>
           <label class="tog" for="fx-ekg"><span>Heartbeat line</span><input type="checkbox" id="fx-ekg"><i></i></label>
@@ -474,6 +514,7 @@ form select{background-color:var(--field)}
       <div class="card panel">
         <form id="form">
           <label id="f-title-l">Name<span>The brand name, or the generic if there is no brand</span><input id="f-title"></label>
+          <label id="f-mine-l">Note for My Meds<span>Optional, e.g. My medication, Mom's meds</span><input id="f-mine" maxlength="120"></label>
           <label>Generic name<span>Separate ingredients with ;</span><input id="f-gen" required></label>
           <label>Also sold as<span>Other versions, one per line</span><textarea id="f-brands"></textarea></label>
           <label>Category<select id="f-cat"></select></label>
@@ -492,7 +533,7 @@ form select{background-color:var(--field)}
 </div></section>
 </div>
 <div class="toast" id="toast" hidden></div>
-<nav class="tabbar" id="tabbar" aria-label="Main"><button type="button" data-t="home" class=""><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><small>Home</small></button><button type="button" data-t="mine" class=""><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2h6V3M9 11h6M9 15h4"/></svg></span><small>My meds</small></button><button type="button" data-t="add" class="add"><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span><small>Add</small></button><button type="button" data-t="ix" class=""><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="12" r="5"/><circle cx="15.5" cy="12" r="5"/></svg></span><small>Interactions</small></button><button type="button" data-t="set" class="pill"><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(-40 12 12)"><rect x="2.5" y="8" width="19" height="8" rx="4" fill="#f3f5f7"/><path d="M12 8h5.5a4 4 0 0 1 0 8H12z" fill="#c95a50"/><rect x="2.5" y="8" width="19" height="8" rx="4" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="1"/><path d="M5 10.2h5" stroke="#fff" stroke-opacity=".7" stroke-width="1" stroke-linecap="round"/></g></svg></span><small>Settings</small></button></nav>
+<nav class="tabbar" id="tabbar" aria-label="Main"><button type="button" data-t="home" class=""><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><small>Home</small></button><button type="button" data-t="mine" class=""><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2h6V3M9 11h6M9 15h4"/></svg></span><small>My Meds</small></button><button type="button" data-t="add" class="add"><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span><small>Add</small></button><button type="button" data-t="ix" class=""><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="12" r="5"/><circle cx="15.5" cy="12" r="5"/></svg></span><small>Interactions</small></button><button type="button" data-t="set" class="pill"><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(-40 12 12)"><rect x="2.5" y="8" width="19" height="8" rx="4" fill="#f3f5f7"/><path d="M12 8h5.5a4 4 0 0 1 0 8H12z" fill="#c95a50"/><rect x="2.5" y="8" width="19" height="8" rx="4" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="1"/><path d="M5 10.2h5" stroke="#fff" stroke-opacity=".7" stroke-width="1" stroke-linecap="round"/></g></svg></span><small>Settings</small></button></nav>
 
 
 <script>
@@ -678,7 +719,7 @@ function passes(m, anyShow) {   // the Show and More-filters choices, used for b
   if (F.form.size < 8 && !FDEF.form.some((f, i) => F.form.has(f) && (m.forms >> i & 1))) return false;
   if (F.type.size < 2 && !F.type.has(m.kind)) return false;
   if (SHOWPREG && F.preg.size < 4) { const p = m.preg, k = !p ? "n" : p <= 3 ? "l" : p <= 6 ? "m" : "h"; if (!F.preg.has(k)) return false; }
-  if (F.mine && !(m.edited || m.custom || m.notes)) return false;
+  if (F.mine && !(m.id in MINE || m.custom)) return false;
   return true;
 }
 const activeFilters = () => ["sched", "form", "type", "preg"].filter(k => F[k].size < FDEF[k].length && (k !== "preg" || SHOWPREG)).length + (F.mine ? 1 : 0) + (F.sort !== "best" ? 1 : 0);
@@ -748,7 +789,7 @@ const FSEC = [
   { k: "form", t: "Form", set: F.form, all: FDEF.form, o: ["By mouth", "Injection / IV", "Skin / patch", "Eye", "Ear", "Inhaled / nasal", "Rectal / vaginal", "Other"] },
   { k: "type", t: "Card type", set: F.type, all: FDEF.type, o: ["Brand", "Generic"] },
   { k: "preg", t: "Pregnancy score", set: F.preg, all: FDEF.preg, o: ["1–3 lower", "4–6 moderate", "7–10 higher", "Not scored"], when: () => SHOWPREG },
-  { k: "mine", t: "Only", one: true, o: ["Medicines I added or edited"] },
+  { k: "mine", t: "Only", one: true, o: ["Medicines in My Meds"] },
   { k: "sort", t: "Sort results", radio: true, all: ["best", "az"], o: ["Best match", "A–Z"] }];
 const fsOpen = new Set();
 const secSummary = sc => sc.one ? (F.mine ? "On" : "Off") : sc.radio ? sc.o[sc.all.indexOf(F.sort)]
@@ -773,6 +814,54 @@ function syncFilters() {   // button summary + results, after any change
   const n = nonDefault(); $("fSum").textContent = n ? n + " on" : "All"; $("fBtn").classList.toggle("act", !!n);
   renderList(); if (!sheet.hidden) renderSheet();
 }
+const msheet = document.createElement("div"), msheetBg = document.createElement("div");
+msheet.className = "fsheet msheet"; msheet.setAttribute("role", "dialog"); msheet.setAttribute("aria-label", "Add to My Meds"); msheet.hidden = true;
+msheetBg.className = "fsbg"; msheetBg.hidden = true; document.body.append(msheetBg, msheet);
+let mPick = null, mFixed = false, mView = "choose";
+function renderMSheet() {
+  const m = mPick && med(mPick), inMine = m && m.id in MINE;
+  if (!m && mView === "choose") {
+    msheet.innerHTML = `<div class="fs-top"><div class="grab"></div><h4>Add</h4></div><div class="fs-body"><div class="achoose">
+      <button type="button" data-act="search"><span class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2h6V3M9 11h6M9 15h4"/></svg></span><span><b>Add to My Meds</b><small>Pick a medicine already in MediFind and add your own note</small></span></button>
+      <button type="button" data-act="create"><span class="ai new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span><b>New medicine</b><small>Create one that isn't in the list yet. It's added to the full list and to My Meds</small></span></button>
+    </div></div>`;
+    return;
+  }
+  msheet.innerHTML = `<div class="fs-top"><div class="grab"></div><h4>${inMine ? "In My Meds" : "Add to My Meds"}</h4></div><div class="fs-body">
+    ${m ? `<label class="f">Medicine</label><div class="pick"><span><b>${esc(m.title)}</b> <small>· ${esc(m.kind === "b" ? fmtGen(m.generic) : "Generic")}</small></span>${mFixed ? "" : `<button type="button" class="linkbtn" data-act="change">Change</button>`}</div>
+      <label class="f" for="mnote">Note <span style="color:var(--sub);font-weight:500">(optional)</span></label>
+      <input id="mnote" type="text" maxlength="120" placeholder="e.g. My medication, Mom's meds, take with breakfast" value="${esc(MINE[m.id] || "")}">`
+    : `<label class="f" for="mq">Find the medicine</label><input id="mq" type="search" placeholder="Type a medicine name" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="sdd" id="mdd" hidden></div>
+      <button type="button" class="linkbtn create" data-act="create">Can't find it? <b>Create a new medicine ›</b></button>`}
+  </div>${m ? `<div class="fs-foot">${inMine ? `<button type="button" class="linkbtn" style="color:var(--salmon)" data-act="remove">Remove</button>` : `<button type="button" class="linkbtn" data-act="cancel">Cancel</button>`}<button type="button" class="btn" data-act="save" style="flex:1">${inMine ? "Save note" : "Add to My Meds"}</button></div>` : ""}`;
+  const q = msheet.querySelector("#mq");
+  if (q) q.addEventListener("input", () => {
+    const v = q.value.trim().toLowerCase(), dd = msheet.querySelector("#mdd");
+    if (v.length < 2) { dd.hidden = true; return; }
+    const hits = ALL.map(x => { const t = x.title.toLowerCase(), g = x.generic.toLowerCase();
+      return [t.startsWith(v) ? 3 : g.startsWith(v) ? 2 : (t.includes(v) || g.includes(v) || x.variants.some(y => y.toLowerCase().includes(v))) ? 1 : 0, x]; })
+      .filter(h => h[0]).sort((a, b) => b[0] - a[0] || a[1].title.localeCompare(b[1].title)).slice(0, 30);
+    dd.innerHTML = hits.length ? hits.map(([, x]) => `<button type="button" data-id="${esc(x.id)}"><b>${esc(x.title)}</b> <small>· ${esc(x.kind === "b" ? fmtGen(x.generic) : "Generic")}${x.id in MINE ? " · ✓ In My Meds" : ""}</small></button>`).join("") : `<button type="button" class="more" disabled>No matches</button>`;
+    dd.hidden = false;
+  });
+}
+function openMSheet(id) {
+  mPick = id || null; mFixed = !!id; mView = "choose"; msheet.hidden = msheetBg.hidden = false; renderMSheet();
+  requestAnimationFrame(() => requestAnimationFrame(() => { msheet.classList.add("open"); msheetBg.classList.add("open"); (msheet.querySelector("#mq") || {}).focus?.(); }));
+}
+function closeMSheet() { msheet.classList.remove("open"); msheetBg.classList.remove("open"); document.activeElement.blur(); setTimeout(() => { msheet.hidden = msheetBg.hidden = true; }, 280); }
+function mineChanged(id) { if (current === id) openCard(id, undefined, true); if (CUR === "mineView") renderMine(); }
+msheetBg.onclick = closeMSheet;
+msheet.addEventListener("click", e => {
+  const pick = e.target.closest("#mdd button[data-id]"); if (pick) { mPick = pick.dataset.id; renderMSheet(); return; }
+  const a = e.target.closest("[data-act]"); if (!a) return; const act = a.dataset.act, id = mPick;
+  if (act === "change") { mPick = null; mView = "search"; renderMSheet(); }
+  if (act === "search") { mView = "search"; renderMSheet(); msheet.querySelector("#mq").focus(); }
+  if (act === "cancel") closeMSheet();
+  if (act === "create") { closeMSheet(); go({ v: "edit", id: null }); }
+  if (act === "save") { const was = id in MINE; MINE[id] = msheet.querySelector("#mnote").value.trim(); mineSave(); closeMSheet(); mineChanged(id); toast(was ? "Note saved ✓" : "Added to My Meds ✓"); }
+  if (act === "remove") { const note = MINE[id]; delete MINE[id]; mineSave(); closeMSheet(); mineChanged(id); toast("Removed from My Meds", () => { MINE[id] = note; mineSave(); mineChanged(id); }); }
+});
 function openSheet() { sheet.hidden = sheetBg.hidden = false; renderSheet(); requestAnimationFrame(() => requestAnimationFrame(() => { sheet.classList.add("open"); sheetBg.classList.add("open"); })); }
 function closeSheet() { sheet.classList.remove("open"); sheetBg.classList.remove("open"); setTimeout(() => { sheet.hidden = sheetBg.hidden = true; }, 280); }
 $("fBtn").onclick = openSheet;
@@ -814,12 +903,19 @@ $("bq").addEventListener("input", () => renderSearch(BRC));
 document.addEventListener("pointerdown", e => { for (const id of ["qdd", "bdd"]) if (!$(id).hidden && !e.target.closest(".qwrap") && !e.target.closest(".dym")) $(id).hidden = true; });
 $("brBack").onclick = () => slide(-1);
 document.querySelectorAll(".sbtn").forEach(b => b.onclick = () => go({ v: "br", s: b.dataset.s }));
-function renderMine() {   // My meds: medicines you added, then ones you changed
-  const added = ALL.filter(m => m.custom), changed = ALL.filter(m => !m.custom && (m.edited || m.notes));
-  const sec = (label, arr) => arr.length ? `<div class="mgrp">${label} · ${arr.length}</div>` + arr.sort((a, b) => a.title.localeCompare(b.title)).map(m => itemHTML(m, m.notes ? "Your note: " + m.notes.slice(0, 60) + (m.notes.length > 60 ? "…" : "") : "")).join("") : "";
-  $("mineList").innerHTML = added.length || changed.length ? sec("Added by you", added) + sec("Changed by you", changed)
-    : `<div class="card empty">Nothing here yet. Tap <b>Add</b> below to create your own medicine, or open any medicine and tap <b>Edit</b> to change it. They'll show up here.</div>`;
+function renderMine() {   // My Meds: the medicines you saved, by note or A–Z
+  const ms = ALL.filter(m => m.id in MINE).sort((a, b) => a.title.localeCompare(b.title));
+  document.querySelectorAll("#mineSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.s === MSORT));
+  $("mineSeg").hidden = !ms.length;
+  const row = m => itemHTML(m, MINE[m.id] ? "Note: " + MINE[m.id] : "");
+  if (!ms.length) { $("mineList").innerHTML = `<div class="card empty">Nothing saved yet. Tap <b>Add</b> below, or tap <b>+ My Meds</b> on any medicine, and give it a note like "My medication" or "Mom's meds".</div>`; return; }
+  if (MSORT === "az") { $("mineList").innerHTML = ms.map(row).join(""); return; }
+  const groups = new Map();
+  for (const m of ms) { const n = (MINE[m.id] || "").trim(), k = n.toLowerCase(); if (!groups.has(k)) groups.set(k, [n || "No note", []]); groups.get(k)[1].push(m); }
+  $("mineList").innerHTML = [...groups.entries()].sort((a, b) => (a[0] === "") - (b[0] === "") || a[0].localeCompare(b[0]))
+    .map(([, [label, arr]]) => `<div class="mgrp">${esc(label)} · ${arr.length}</div>` + arr.map(m => itemHTML(m, "")).join("")).join("");
 }
+$("mineSeg").addEventListener("click", e => { const b = e.target.closest("button[data-s]"); if (!b) return; MSORT = b.dataset.s; try { localStorage.setItem("medifind-minesort", MSORT); } catch (x) {} renderMine(); });
 $("bgroups").addEventListener("click", e => {
   const r = e.target.closest(".mrow"); if (r) return go({ v: "card", id: r.dataset.id, name: "" });
   const h = e.target.closest(".grp-head"); if (!h) return;
@@ -904,6 +1000,40 @@ let current = null, curName = null, scrollY = 0, CUR = "listView";
 const PANE = { listView: "listPane", cardView: "cardPane", editView: "editPane", ixView: "ixPane", setView: "setPane", brView: "brPane", mineView: "minePane" };
 function show(v) { CUR = v; arrange(); }
 const bullets = (title, arr) => `<div class="sec"><h3>${title}</h3>${arr.length ? `<ul>${arr.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : `<div class="none">Not filled in yet</div>`}</div>`;
+// ---------- My Meds: medicines you save, each with your own note ----------
+var MINE; try { MINE = JSON.parse(localStorage.getItem("medifind-mine")) || {}; } catch (e) { MINE = {}; }
+const mineSave = () => { try { localStorage.setItem("medifind-mine", JSON.stringify(MINE)); } catch (e) {} };
+let MSORT = "note"; try { MSORT = localStorage.getItem("medifind-minesort") || "note"; } catch (e) {}
+const KEYS = [["sched", "Schedule"], ["names", "Names"], ["sides", "Side effects"], ["off", "Off-label uses"], ["org", "Organs"], ["cls", "Therapeutic class"], ["avail", "Availability"], ["preg", "Pregnancy"], ["notes", "My notes"]];
+let KEYON = new Set(["sched", "names", "sides"]); try { const k = JSON.parse(localStorage.getItem("medifind-key")); if (Array.isArray(k)) KEYON = new Set(k); } catch (e) {}
+const plain = h => h.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+function cardSections(m, others, list, cnt) {   // in order of importance; checked ones open in Key info, the rest as rows with a preview
+  const chips = arr => `<div class="chips">${arr.map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>`;
+  const [tr, hm] = organsOf(m), S = [];
+  if (schedOf(m)) { const b = schedBody(m); S.push(["sched", "Schedule " + schedOf(m), schipHTML(schedOf(m)), b, plain(b).slice(0, 90)]); }
+  const gens = m.generic.split(";").map(x => capW(x.trim()));
+  S.push(["names", "Names", gens.length > 1 ? gens.length + " ingredients" : "", `<div><span class="none">Generic:</span> ${esc(gens.join(" + "))}</div>${m.cls ? `<div class="none" style="margin-top:4px">Drug class: ${esc(m.cls)}</div>` : ""}${others.length ? `<div style="margin-top:6px"><span class="none">Other brands, same generic:</span> ${esc(others.join(", "))}</div>` : ""}`,
+    gens.join(" + ") + (others.length ? " · also " + others.slice(0, 2).join(", ") : "")]);
+  S.push(["sides", "Side effects", cnt(m.sides), list(m.sides), m.sides.join(", ") || "Not filled in yet"]);
+  S.push(["off", "Off-label uses", m.off.length || !DETAILS[m.generic] ? cnt(m.off) : "None", list(m.off, DETAILS[m.generic] ? "None commonly known" : undefined), m.off.join(", ") || (DETAILS[m.generic] ? "None commonly known" : "Not filled in yet")]);
+  if (tr.length || hm.length) S.push(["org", "Organs", [...new Set([...tr, ...hm])].length, `<div class="orgs">${tr.length ? `<div><b>Works on</b>${chips(tr)}</div>` : ""}${hm.length ? `<div><b>Side effects may involve</b>${chips(hm)}</div>` : ""}</div>`, tr.length ? "Works on " + tr.join(", ") : "May involve " + hm.join(", ")]);
+  const cn = m.cats.map(c => (CATS[c] || ["Other"])[0]);
+  S.push(["cls", "Therapeutic class", cnt(m.cats), chips(cn), cn.join(", ")]);
+  const av = m.otc === 1 ? "OTC" : m.otc === 2 ? "Rx &amp; OTC" : "Rx only";
+  S.push(["avail", "Availability", `<span class="avail">${av}</span>`, `<div>${m.otc === 1 ? "Sold over the counter, without a prescription." : m.otc === 2 ? "Sold both over the counter and by prescription." : "Prescription only."}</div>${m.otcNote ? `<div class="none" style="margin-top:6px">${esc(m.otcNote)}</div>` : ""}`, m.otc === 1 ? "Sold without a prescription" : m.otc === 2 ? "Over the counter and by prescription" : "Prescription only"]);
+  if (SHOWPREG) S.push(["preg", "Pregnancy", m.preg ? `<b style="color:${pregColor(m.preg)}">${m.preg}/10</b>` : "", m.preg ? `
+        <div class="pscore"><strong style="color:${pregColor(m.preg)}">${m.preg}/10</strong><span>${pregWord(m.preg)}</span></div>
+        <div class="meter">${Array.from({ length: 10 }, (_, k) => `<span style="${k < m.preg ? "background:" + pregColor(m.preg) : ""}"></span>`).join("")}</div>
+        ${m.pnote ? `<div>${esc(m.pnote)}</div>` : ""}` : `<div class="none">Not scored yet</div>`, m.preg ? pregWord(m.preg) + (m.pnote ? " · " + m.pnote : "") : "Not scored yet"]);
+  if (m.notes) S.push(["notes", "My notes", "", `<div>${esc(m.notes).replace(/\n/g, "<br>")}</div>`, m.notes]);
+  const key = S.filter(x => KEYON.has(x[0])), more = S.filter(x => !KEYON.has(x[0]));
+  const sched = k => k === "sched" ? " sched" : "";
+  return (key.length ? `<div class="klbl">Key info</div><div class="kbox">${key.map(([k, t, meta, body]) => `<div class="ks${sched(k)}"><div class="kh"><h3>${t}</h3><span class="meta">${meta}</span></div>${body}</div>`).join("")}</div>` : "")
+    + (more.length ? `${key.length ? `<div class="klbl">More info</div>` : ""}<div class="accs sec">${more.map(([k, t, meta, body, pk]) => `<details class="acc${sched(k)}"><summary><div class="t"><h3>${t}</h3><span class="pk">${esc(pk)}</span></div><span class="meta">${meta}</span>${chev}</summary><div class="body">${body}</div></details>`).join("")}</div>` : "");
+}
+function renderKeyChks() {
+  $("keyChks").innerHTML = KEYS.map(([k, l]) => `<label class="kchk"><input type="checkbox" data-k="${k}"${KEYON.has(k) ? " checked" : ""}>${l}</label>`).join("");
+}
 function openCard(id, name, prep) {
   const m = med(id); if (!m) return;
   if (CUR === "listView") scrollY = $("listPane").scrollTop;
@@ -919,22 +1049,8 @@ function openCard(id, name, prep) {
       ${m.variants.length ? `<div class="aka">Also sold as: ${esc(m.variants.join(", "))}</div>` : ""}
       ${m.old.length ? `<div class="aka">${m.kind === "b" ? "Formerly" : "Brand"}: ${esc(m.old.join(", "))}</div>` : ""}</div></div>
     <div class="usedfor"><h3>Used for</h3>${list(m.uses)}</div>
-    <button class="btn2 ixgo" type="button">Check interactions</button>
-    <div class="accs sec">
-      ${schedOf(m) ? acc("Schedule " + schedOf(m), schipHTML(schedOf(m)), schedBody(m)).replace('<details class="acc">', '<details class="acc sched">') : ""}
-      ${acc("Generic name", m.generic.includes(";") ? m.generic.split(";").length + " ingredients" : "", `${list(m.generic.split(";").map(x => capW(x.trim())))}${m.cls ? `<div class="none" style="margin-top:6px">Drug class: ${esc(m.cls)}</div>` : ""}`)}
-      ${others.length ? acc("Other brands, same generic", others.length, list(others)) : ""}
-      ${acc("Availability", `<span class="avail">${m.otc === 1 ? "OTC" : m.otc === 2 ? "Rx &amp; OTC" : "Rx only"}</span>`, `<div>${m.otc === 1 ? "Sold over the counter, without a prescription." : m.otc === 2 ? "Sold both over the counter and by prescription." : "Prescription only."}</div>${m.otcNote ? `<div class="none" style="margin-top:6px">${esc(m.otcNote)}</div>` : ""}`)}
-      ${(() => { const [tr, hm] = organsOf(m); return tr.length || hm.length ? acc("Organs", tr.length + hm.length ? [...new Set([...tr, ...hm])].length : "", `<div class="orgs">${tr.length ? `<div><b>Works on</b><div class="chips">${tr.map(o => `<span class="chip">${esc(o)}</span>`).join("")}</div></div>` : ""}${hm.length ? `<div><b>Side effects may involve</b><div class="chips">${hm.map(o => `<span class="chip">${esc(o)}</span>`).join("")}</div></div>` : ""}</div>`) : ""; })()}
-      ${acc("Therapeutic class", cnt(m.cats), `<div class="chips">${m.cats.map(c => `<span class="chip">${esc((CATS[c] || ["Other"])[0])}</span>`).join("")}</div>`)}
-      ${acc("Off-label uses", m.off.length || !DETAILS[m.generic] ? cnt(m.off) : "None", list(m.off, DETAILS[m.generic] ? "None commonly known" : undefined))}
-      ${acc("Common side effects", cnt(m.sides), list(m.sides))}
-      ${!SHOWPREG ? "" : acc("Pregnancy", "", m.preg ? `
-        <div class="pscore"><strong style="color:${pregColor(m.preg)}">${m.preg}/10</strong><span>${pregWord(m.preg)}</span></div>
-        <div class="meter">${Array.from({ length: 10 }, (_, k) => `<span style="${k < m.preg ? "background:" + pregColor(m.preg) : ""}"></span>`).join("")}</div>
-        ${m.pnote ? `<div>${esc(m.pnote)}</div>` : ""}` : `<div class="none">Not scored yet</div>`)}
-      ${m.notes ? acc("My notes", "", `<div>${esc(m.notes).replace(/\n/g, "<br>")}</div>`) : ""}
-    </div>
+    <div class="btnrow"><button class="btn2 ixgo" type="button">Check interactions</button><button class="btn2 minego${m.id in MINE ? " in" : ""}" type="button">${m.id in MINE ? "✓ My Meds" + (MINE[m.id] ? " · " + esc(MINE[m.id]) : "") : "+ My Meds"}</button></div>
+    ${cardSections(m, others, list, cnt)}
     <p class="fine">Personal reference only.${SHOWPREG ? " Pregnancy scores are your own 1–10 scale, not an official FDA rating." : ""}${schedOf(m) ? " Law summaries are for reference, not legal advice." : ""}</p>
   </div>`;
   if (!prep) { $("cardPane").scrollTop = 0; show("cardView"); }
@@ -1068,6 +1184,7 @@ $("ixClear").onclick = () => { if (!IXL.length) return; const was = IXL.slice(),
 $("ixBack").onclick = () => slide(-1);
 $("ixOpen").onclick = () => { ixShown = IXL.length > 1; go({ v: "ix" }); };
 ixEntry();
+$("card").addEventListener("click", e => { if (e.target.closest(".minego") && current) return openMSheet(current); });
 $("card").addEventListener("click", e => { if (e.target.closest(".ixgo") && current) { if (!IXL.includes(current)) { IXL.push(current); ixSave(); } ixShown = IXL.length > 1; go({ v: "ix" }); } });
 
 // ---------- Edit ----------
@@ -1080,6 +1197,7 @@ function openEdit(id, prep) {
   editing = id;
   $("f-gen").value = m.generic; $("f-gen").readOnly = !!id && !m.custom;
   $("f-title").value = m.title; $("f-title-l").hidden = !m.custom;
+  $("f-mine").value = ""; $("f-mine-l").hidden = !!id;
   $("f-brands").value = m.variants.join("\n");
   $("f-cat").value = m.cats[0] ?? 0;
   $("f-uses").value = m.uses.join("\n"); $("f-off").value = m.off.join("\n"); $("f-sides").value = m.sides.join("\n");
@@ -1115,7 +1233,8 @@ $("form").addEventListener("submit", ev => {
   try { saveEdits(); } catch (e) { $("saveNote").textContent = "Couldn't save. Your phone may be out of storage."; return; }
   ALL = allMeds(); toast("Saved ✓");
   if (editing) { openCard(id, "", true); slide(-1); }   // back to the card, redrawn with the new details
-  else { history.replaceState({ v: "card", id, i: navIdx }, ""); stack[navIdx] = { v: "card", id }; navMax = navIdx; openCard(id, ""); }
+  else { MINE[id] = $("f-mine").value.trim(); mineSave();
+    history.replaceState({ v: "card", id, i: navIdx }, ""); stack[navIdx] = { v: "card", id }; navMax = navIdx; openCard(id, ""); }
 });
 $("reset").onclick = () => {
   const r = $("reset");
@@ -1297,7 +1416,7 @@ $("tabbar").addEventListener("click", e => {
   if (t === "set") { b.classList.remove("spin"); void b.offsetWidth; b.classList.add("spin"); }
   if (formDirty()) return toast("Tap Save or Cancel first");
   if (t === "mine" && CUR !== "mineView") go({ v: "mine" });
-  if (t === "add" && !(CUR === "editView" && st.id === null)) go({ v: "edit", id: null });
+  if (t === "add") openMSheet();
   if (t === "ix" && CUR !== "ixView") { ixShown = IXL.length > 1; go({ v: "ix" }); }
   if (t === "set" && CUR !== "setView") go({ v: "set" });
 });
@@ -1317,13 +1436,20 @@ document.querySelectorAll("#floatSeg button").forEach(b => b.onclick = () => { F
 $("fx-plain").onclick = () => { Object.assign(FX, { body: false, ekg: false, dna: false, float: "none" }); applyFX(true); };
 applyFX(false);
 $("opt-preg").checked = SHOWPREG;
+renderKeyChks();
+$("keyChks").addEventListener("change", e => {
+  const k = e.target.dataset.k; if (!k) return;
+  e.target.checked ? KEYON.add(k) : KEYON.delete(k);
+  try { localStorage.setItem("medifind-key", JSON.stringify([...KEYON])); } catch (x) {}
+  if (current) openCard(current, undefined, true);
+});
 $("opt-preg").onchange = e => { SHOWPREG = e.target.checked; try { localStorage.setItem("medifind-preg", SHOWPREG ? "1" : "0"); } catch (x) {} if (current) openCard(current, undefined, true); };
 
 // ---------- Backup ----------
 function bkInfo() { const n = Object.keys(edits).length; $("bkInfo").textContent = n ? n + (n === 1 ? " medicine edited or added" : " medicines edited or added") : "No edits yet"; }
 $("exp").onclick = async () => {
   const name = "medifind-backup-" + new Date().toISOString().slice(0, 10) + ".json";
-  const file = new File([JSON.stringify(edits, null, 1)], name, { type: "application/json" });
+  const file = new File([JSON.stringify({ ...edits, _mymeds: MINE }, null, 1)], name, { type: "application/json" });
   try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file] }); return; } } catch (e) { if (e.name === "AbortError") return; }
   const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = name; a.click();
 };
@@ -1332,6 +1458,8 @@ $("imp").onchange = async e => {
   try {
     const data = JSON.parse(await f.text());
     if (!data || typeof data !== "object" || Array.isArray(data)) throw 0;
+    if (data._mymeds && typeof data._mymeds === "object") { Object.assign(MINE, data._mymeds); mineSave(); }
+    delete data._mymeds;
     const n = Object.keys(data).length;
     Object.assign(edits, data); saveEdits(); ALL = allMeds(); renderList(); bkInfo();
     toast("Imported " + n + (n === 1 ? " medicine" : " medicines"));
