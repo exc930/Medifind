@@ -230,6 +230,76 @@ body.qdocked .hero{-webkit-backdrop-filter:none;backdrop-filter:none;z-index:40}
 .achoose .ai{flex:none;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(160deg,var(--teal),var(--teal2));color:#fff}
 .achoose .ai.new{background:linear-gradient(160deg,var(--coral),var(--salmon))}.achoose svg{width:24px;height:24px}
 .msheet .fs-top h4{text-align:center}
+
+/* ===== Computer version (900px and wider): sidebar, top search bar, dashboard. The phone never sees any of this. ===== */
+#side,#webtop,.dash{display:none}
+@media (min-width:900px){
+  :root{--sidew:232px;--toph:70px}
+  body.sidecol{--sidew:76px}
+  #tabbar{display:none!important}
+  #side{display:flex;flex-direction:column;gap:4px;position:fixed;left:0;top:0;bottom:0;width:var(--sidew);z-index:46;padding:18px 12px;background:rgba(4,14,30,.55);border-right:1px solid var(--fline);transition:width .2s;overflow:hidden}
+  :root:not([data-mode="dark"]) #side{background:rgba(244,248,252,.6)}
+  #side .stop{display:flex;align-items:center;justify-content:space-between;margin:2px 4px 20px;min-height:32px}
+  #side .slogo{font-weight:300;letter-spacing:.35em;font-size:16px;color:var(--logo);white-space:nowrap}
+  #side .stog{border:1px solid var(--fline);background:none;color:var(--sub);width:30px;height:30px;border-radius:9px;font-size:16px;cursor:pointer;flex:none}
+  .snav,.sadd{display:flex;align-items:center;gap:12px;border:0;background:none;color:var(--sub);font:inherit;font-weight:600;font-size:.95rem;padding:10px 12px;border-radius:11px;cursor:pointer;text-align:left;white-space:nowrap;position:relative}
+  .snav:hover{background:var(--chipbg);color:var(--text)}
+  .snav.on{background:var(--chipbg);color:var(--teal-txt)}
+  .si{flex:none;width:24px;height:24px;display:grid;place-items:center}.si svg{width:22px;height:22px}
+  .snav.pill .si svg{width:26px;height:26px;color:var(--ink)}.snav.pill.spin .si svg{animation:spin .6s ease-in-out}
+  .sl{flex:1}
+  .sbadge:empty{display:none}.sbadge{background:var(--teal);color:#fff;border-radius:9px;font-size:.7rem;font-weight:800;padding:1px 7px}
+  .sadd{justify-content:center;margin:14px 2px 4px;color:#fff;background:linear-gradient(160deg,var(--coral),var(--salmon));border-radius:999px;font-weight:700}
+  body.sidecol #side .slogo,body.sidecol .sl{display:none}
+  body.sidecol #side .stop{justify-content:center}
+  body.sidecol .snav,body.sidecol .sadd{justify-content:center;padding:10px 0}
+  body.sidecol .sbadge{position:absolute;top:2px;right:6px;padding:0 5px}
+  body.sidecol .sadd{width:46px;height:46px;border-radius:50%;margin:14px auto 4px;padding:0}
+  #webtop{display:flex;align-items:center;gap:12px;position:fixed;top:0;right:0;left:var(--sidew);height:var(--toph);z-index:45;padding:0 32px;background:#081a33;border-bottom:1px solid var(--fline);transition:left .2s}
+  :root:not([data-mode="dark"]) #webtop{background:#eef4fa}
+  #webtop .wq{flex:1;max-width:760px}
+  #webtop .fbtn{align-self:center;margin:0}
+  #webtop .wq input{padding-left:42px;padding-right:40px}
+  #webtop .wqi{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--sub);width:18px;height:18px;pointer-events:none}.wqi svg{width:18px;height:18px}
+  #webtop .kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%);border:1px solid var(--fline);border-radius:6px;padding:0 7px;font-size:.75rem;color:var(--sub);pointer-events:none}
+  #webtop .wq:focus-within .kbd{display:none}
+  #webtop .dym{top:calc(100% + 8px)!important;bottom:auto}
+  #webtop .qwrap:has(.dym:not([hidden])) .sdd{top:calc(100% + 66px)}
+  #webtop .sdd{max-height:min(70vh,560px)}
+  .sdd button.hl{background:var(--chipbg)}
+  #pager{left:var(--sidew)!important;top:var(--toph)!important;transition:left .2s}
+  .pane .wrap{max-width:1120px!important;padding-top:28px!important;padding-bottom:60px!important;padding-left:32px;padding-right:32px}
+  #editPane .wrap,#setPane .wrap,#ixPane .wrap,#minePane .wrap{max-width:860px!important}
+  .toast{bottom:28px!important}
+  #topArt,#listView .hero,#listView .sec-bar,#listView .list,#listView .bar{display:none!important}
+  .dash{display:block}
+  .dash h2{margin:0;font-size:1.7rem}.dash .sub{color:var(--sub);margin:4px 0 20px}
+  .dstats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .dstat{display:block;text-align:left;padding:18px 20px;border:1px solid var(--fline);border-radius:16px;background:var(--card);color:var(--text);font:inherit;cursor:pointer}
+  .dstat:hover{border-color:var(--teal)}
+  .dstat small{font-size:.7rem;font-weight:800;letter-spacing:.14em;color:var(--sub)}.dstat b{display:block;font-size:1.9rem;margin-top:2px}
+  .dgrid2{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;margin-top:20px;align-items:start}
+  .dbox{border:1px solid var(--fline);border-radius:16px;background:var(--card);padding:16px 18px}
+  .dbox .dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:.7rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--salmon)}
+  .dbox .dh button{border:0;background:none;color:var(--teal-txt);font:inherit;font-size:.8rem;letter-spacing:0;text-transform:none;font-weight:700;cursor:pointer}
+  .drow{display:flex;align-items:center;gap:12px;width:100%;border:0;border-bottom:1px solid var(--fline);background:none;color:var(--text);font:inherit;text-align:left;padding:10px 4px;cursor:pointer}
+  .drow:last-child{border-bottom:0}.drow:hover{background:var(--chipbg)}
+  .drow .txt{flex:1;min-width:0}.drow small{display:block;color:var(--sub)}
+  .dempty{color:var(--sub);font-size:.9rem;padding:6px 0}
+  .dix{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:1px solid var(--fline);border-radius:16px;background:var(--card);color:var(--text);font:inherit;padding:16px 18px;cursor:pointer;margin-top:20px}
+  .dix .tile{background:linear-gradient(160deg,var(--coral),var(--salmon))}.dix small{display:block;color:var(--sub)}
+  .dchips{display:flex;flex-wrap:wrap;gap:8px}
+  .dchips button{border:1px solid var(--fline);background:var(--field);color:var(--text);border-radius:999px;padding:7px 13px;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer}
+  /* medicine: Key info on the left, More info on the right */
+  label[for="fx-body"],label[for="fx-ekg"]{display:none!important}   /* the body and heartbeat art is off on computers, so those switches are hidden there */
+  #card .detail{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;align-items:start}
+  #card .detail > .dhead,#card .detail > .fine{grid-column:1/-1}
+  #card .detail > .usedfor,#card .detail > .btnrow,#card .detail > .kcol{grid-column:1}
+  #card .detail > .mcol{grid-column:2;grid-row:2/span 3}
+  #card .detail > .mcol .klbl:first-child{margin-top:14px}
+  #bgroups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+  #bgroups .grp:has(.grp-head[aria-expanded="true"]){grid-column:1/-1}
+}
 /* bottom tab bar: floating, solid */
 .tabbar{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:48;max-width:520px;margin:0 auto;display:flex;justify-content:space-around;align-items:center;padding:8px 6px;border-radius:26px;background:var(--sky1);border:1px solid var(--fline);box-shadow:0 10px 30px rgba(0,0,0,.3)}
 .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;color:var(--sub);font:inherit;padding:4px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;min-width:0}
@@ -391,12 +461,15 @@ form select{background-color:var(--field)}
   </defs>
 </svg>
 
+<aside id="side" aria-label="Main menu"><div class="stop"><span class="slogo">MEDIFIND</span><button type="button" id="sideTog" class="stog" title="Collapse menu" aria-label="Collapse menu">«</button></div><button type="button" class="snav" data-t="home" title="Home"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="sl">Home</span><span class="sbadge"></span></button><button type="button" class="snav" data-t="rx" title="Prescription"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span><span class="sl">Prescription</span><span class="sbadge"></span></button><button type="button" class="snav" data-t="otc" title="Over-the-counter"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg></span><span class="sl">Over-the-counter</span><span class="sbadge"></span></button><button type="button" class="snav" data-t="mine" title="My Meds"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2h6V3M9 11h6M9 15h4"/></svg></span><span class="sl">My Meds</span><span class="sbadge"></span></button><button type="button" class="snav" data-t="ix" title="Interactions"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="12" r="5"/><circle cx="15.5" cy="12" r="5"/></svg></span><span class="sl">Interactions</span><span class="sbadge"></span></button><button type="button" class="sadd" data-t="add" title="Add"><span class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="sl">Add</span></button><div style="flex:1"></div><button type="button" class="snav pill" data-t="set" title="Settings"><span class="si"><svg viewBox="0 0 24 24"><g transform="rotate(-40 12 12)"><rect x="2.5" y="8" width="19" height="8" rx="4" fill="#f3f5f7"/><path d="M12 8h5.5a4 4 0 0 1 0 8H12z" fill="#c95a50"/><rect x="2.5" y="8" width="19" height="8" rx="4" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="1"/></g></svg></span><span class="sl">Settings</span><span class="sbadge"></span></button></aside>
+<header id="webtop"><div class="qwrap wq"><span class="wqi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span><input id="wq" type="search" placeholder="Search 3,378 medicines by name, class, use or organ" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search medicines"><span class="kbd">/</span><div class="sdd" id="wdd" hidden></div></div><button type="button" class="fbtn" id="wFilt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filters <small id="wFsum">All</small></button></header>
 <div id="pager">
 <section class="pane" id="listPane"><div class="wrap">
   <!-- Search -->
   <div id="listView" class="view">
     <div style="display:flex;flex-direction:column;gap:14px">
       <div class="bar"><button class="pill" id="addBtn" type="button">+ Add</button><button class="pill cap" id="setBtn" type="button" aria-label="Settings" aria-expanded="false"><svg viewBox="0 0 24 24"><g transform="rotate(-40 12 12)"><rect x="2.5" y="8" width="19" height="8" rx="4" fill="#f3f5f7"/><path d="M12 8h5.5a4 4 0 0 1 0 8H12z" fill="#c95a50"/><rect x="2.5" y="8" width="19" height="8" rx="4" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="1"/><path d="M5 10.2h5" stroke="#fff" stroke-opacity=".7" stroke-width="1" stroke-linecap="round"/></g></svg></button></div>
+      <div class="dash" id="dash"></div>
       <div class="top-art" id="topArt">
         <div class="brand">
           <div class="logo">MEDIFIND</div>
@@ -736,7 +809,7 @@ function ixTargets(q) {   // what "Interaction" search looks for: alcohol/foods,
 }
 const RGROUPS = [["name", "Name"], ["cls", "Drug class"], ["uses", "Used for"], ["off", "Off-label use"], ["org", "Organ"], ["side", "Side effect"], ["ix", "Interacts with"]];
 const HOME = { q: "q", dd: "qdd" }, BRC = { q: "bq", dd: "bdd", browse: true };
-function renderList() { renderSearch(HOME); if (CUR === "brView") renderBrowse(); }   // after filters or edits change: refresh what's on screen
+function renderList() { renderSearch(HOME); if (CUR === "brView") renderBrowse(); if (WIDE()) { if (!$("wdd").hidden) renderSearch(WEB); if (CUR === "listView") renderDash(); } }   // after filters or edits change: refresh what's on screen
 function itemHTML(m, why, q = "") {
   const alias = q && !why && !m.title.toLowerCase().includes(q) && !m.generic.includes(q) ? [...m.variants, ...(m.kind === "b" ? m.old : [])].find(x => x.toLowerCase().includes(q)) : "";
   return `<button class="card item" type="button" data-id="${esc(m.id)}">${tile}
@@ -779,7 +852,7 @@ function renderSearch(ctx) {
   const row = ([, m, why]) => `<button type="button" data-id="${esc(m.id)}"><b>${esc(m.title)}</b> <small>· ${esc(m.kind === "b" ? fmtGen(m.generic) : "Generic")}${schedOf(m) ? " · C" + schedOf(m) : ""}${m.otc === 1 ? " · OTC" : ""}</small>${why ? `<span class="r">${esc(why)}</span>` : ""}</button>`;
   dd.innerHTML = rows.length ? rows.slice(0, MAX).map(row).join("") + (rows.length > MAX ? `<button type="button" class="more" disabled>${rows.length - MAX} more · keep typing to narrow it down</button>` : "")
     : `<button type="button" class="more" disabled>No matches${narrowed ? " with these filters" : ""}</button>`;
-  dd.hidden = false; dd.scrollTop = 0;
+  if (document.activeElement === $(ctx.q) || !dd.hidden) { dd.hidden = false; dd.scrollTop = 0; }
 }
 // ---------- Filters sheet (slides up from the bottom, like iPhone apps) ----------
 const FSEC = [
@@ -811,7 +884,7 @@ function renderSheet() {
   sheet.querySelector(".fs-body").scrollTop = scroll;
 }
 function syncFilters() {   // button summary + results, after any change
-  const n = nonDefault(); $("fSum").textContent = n ? n + " on" : "All"; $("fBtn").classList.toggle("act", !!n);
+  const n = nonDefault(); $("fSum").textContent = n ? n + " on" : "All"; $("wFsum").textContent = n ? n + " on" : "All"; $("fBtn").classList.toggle("act", !!n);
   renderList(); if (!sheet.hidden) renderSheet();
 }
 const msheet = document.createElement("div"), msheetBg = document.createElement("div");
@@ -991,6 +1064,7 @@ function attachDYM(input, getVoc) {
 }
 attachDYM($("q"), medVocab);
 attachDYM($("bq"), medVocab);
+attachDYM($("wq"), medVocab);
 ORDER.forEach(i => $("f-cat").add(new Option(CATS[i][0], i)));
 $("f-preg").add(new Option("Not set", ""));
 for (let i = 1; i <= 10; i++) $("f-preg").add(new Option(i + (i === 1 ? " (safest)" : i === 10 ? " (most dangerous)" : ""), i));
@@ -1028,8 +1102,8 @@ function cardSections(m, others, list, cnt) {   // in order of importance; check
   if (m.notes) S.push(["notes", "My notes", "", `<div>${esc(m.notes).replace(/\n/g, "<br>")}</div>`, m.notes]);
   const key = S.filter(x => KEYON.has(x[0])), more = S.filter(x => !KEYON.has(x[0]));
   const sched = k => k === "sched" ? " sched" : "";
-  return (key.length ? `<div class="klbl">Key info</div><div class="kbox">${key.map(([k, t, meta, body]) => `<div class="ks${sched(k)}"><div class="kh"><h3>${t}</h3><span class="meta">${meta}</span></div>${body}</div>`).join("")}</div>` : "")
-    + (more.length ? `${key.length ? `<div class="klbl">More info</div>` : ""}<div class="accs sec">${more.map(([k, t, meta, body, pk]) => `<details class="acc${sched(k)}"><summary><div class="t"><h3>${t}</h3><span class="pk">${esc(pk)}</span></div><span class="meta">${meta}</span>${chev}</summary><div class="body">${body}</div></details>`).join("")}</div>` : "");
+  return (key.length ? `<div class="kcol"><div class="klbl">Key info</div><div class="kbox">${key.map(([k, t, meta, body]) => `<div class="ks${sched(k)}"><div class="kh"><h3>${t}</h3><span class="meta">${meta}</span></div>${body}</div>`).join("")}</div></div>` : "")
+    + (more.length ? `<div class="mcol">${key.length ? `<div class="klbl">More info</div>` : ""}<div class="accs sec">${more.map(([k, t, meta, body, pk]) => `<details class="acc${sched(k)}"><summary><div class="t"><h3>${t}</h3><span class="pk">${esc(pk)}</span></div><span class="meta">${meta}</span>${chev}</summary><div class="body">${body}</div></details>`).join("")}</div></div>` : "");
 }
 function renderKeyChks() {
   $("keyChks").innerHTML = KEYS.map(([k, l]) => `<label class="kchk"><input type="checkbox" data-k="${k}"${KEYON.has(k) ? " checked" : ""}>${l}</label>`).join("");
@@ -1275,15 +1349,13 @@ const WIDE = () => matchMedia("(min-width: 900px)").matches;
 function arrange() {   // previous page on the left, current in the middle, next on the right
   tabSync();
   const { pv, nv } = neighbors(), pager = $("pager");
-  const split = WIDE() && CUR !== "listView";
+  const split = false;
   if (document.body.classList.contains("split") !== split) { document.body.classList.toggle("split", split); requestAnimationFrame(() => dispatchEvent(new Event("layoutchange"))); }
-  if (WIDE()) {   // computer window: the list stays on the left, the opened medicine on the right
+  if (WIDE()) {   // computer window: one page at a time, next to the sidebar
     for (const v of ["listView", "cardView", "editView", "ixView", "setView", "brView", "mineView"]) {
-      const pane = $(PANE[v]), was = pane.hidden;
-      pane.hidden = !(v === "listView" || v === CUR);
-      if (v === "listView" && was && !pane.hidden) pane.scrollTop = scrollY;
-      pane.style.order = v === "listView" ? 0 : 1;
+      const pane = $(PANE[v]); pane.hidden = v !== CUR; pane.style.order = 0;
     }
+    if (CUR === "listView") renderDash();
     pager.scrollLeft = 0; return;
   }
   for (const v of ["listView", "cardView", "editView", "ixView", "setView", "brView", "mineView"]) {
@@ -1337,6 +1409,7 @@ function noteRecent(id) {
   renderRecent();
 }
 function go(st) {
+  document.querySelectorAll(".dym").forEach(d => d.hidden = true);   // a "Did you mean" bubble never follows you to another page
   if (st.v === "card" && st.id) noteRecent(st.id);   // open a new page to the right and glide to it
   stack.length = navIdx + 1; stack[navIdx + 1] = st; navMax = navIdx + 1; pendingPush = true;
   paint(st); arrange(); requestAnimationFrame(() => requestAnimationFrame(() => slide(1)));
@@ -1400,7 +1473,69 @@ $("setBtn").onclick = () => {
   go({ v: "set" });   // Settings is its own page: edge-swipe back closes it, edge-swipe forward reopens it
 };
 $("setDone").onclick = () => slide(-1);
+// ---------- Computer version: sidebar, top search, dashboard ----------
+const WEB = { q: "wq", dd: "wdd" };
+try { if (localStorage.getItem("medifind-side") === "0") document.body.classList.add("sidecol"); } catch (e) {}
+function sideTogLabel() { const c = document.body.classList.contains("sidecol"); $("sideTog").textContent = c ? "»" : "«"; $("sideTog").title = c ? "Expand menu" : "Collapse menu"; }
+sideTogLabel();
+$("sideTog").onclick = () => { document.body.classList.toggle("sidecol"); try { localStorage.setItem("medifind-side", document.body.classList.contains("sidecol") ? "0" : "1"); } catch (e) {} sideTogLabel(); };
+$("side").addEventListener("click", e => {
+  const b = e.target.closest("[data-t]"); if (!b || b.id === "sideTog") return;
+  const t = b.dataset.t;
+  if (t === "rx" || t === "otc") { if (formDirty()) return toast("Tap Save or Cancel first"); if (!(CUR === "brView" && BR === t)) go({ v: "br", s: t }); return; }
+  const tb = document.querySelector(`#tabbar [data-t="${t}"]`); tb && tb.click();
+  if (t === "set") { b.classList.remove("spin"); void b.offsetWidth; b.classList.add("spin"); }
+});
+function sideSync() {
+  const st = stack[navIdx] || {}, on = CUR === "brView" ? BR : ({ listView: "home", mineView: "mine", ixView: "ix", setView: "set" }[CUR] || "");
+  document.querySelectorAll("#side .snav").forEach(b => b.classList.toggle("on", b.dataset.t === on));
+  const n = Object.keys(MINE).filter(id => med(id)).length;
+  document.querySelector('#side [data-t="mine"] .sbadge').textContent = n || "";
+  document.querySelector('#side [data-t="ix"] .sbadge').textContent = IXL.length || "";
+}
+function renderDash() {
+  const h = new Date().getHours(), hi = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+  const rx = ALL.filter(m => m.otc !== 1).length, otc = ALL.filter(m => m.otc >= 1).length;
+  const mine = ALL.filter(m => m.id in MINE).sort((a, b) => a.title.localeCompare(b.title));
+  const rec = (RECENT || loadRecent()).map(med).filter(Boolean);
+  const ixn = IXL.map(k => ixItem(k)).filter(Boolean).map(x => x.name);
+  const drow = m => `<button type="button" class="drow" data-id="${esc(m.id)}">${tile}<span class="txt"><b>${esc(m.title)}${otcTag(m)}</b><small>${esc(MINE[m.id] || (m.kind === "b" ? fmtGen(m.generic) : "Generic"))}</small></span>${schipHTML(schedOf(m))}${chev}</button>`;
+  $("dash").innerHTML = `<h2>${hi}</h2><div class="sub">Find a medicine, check your list, or look up interactions.</div>
+    <div class="dstats"><button type="button" class="dstat" data-go="search"><small>ALL MEDICINES</small><b>${ALL.length.toLocaleString()}</b></button><button type="button" class="dstat" data-go="rx"><small>PRESCRIPTION</small><b>${rx.toLocaleString()}</b></button><button type="button" class="dstat" data-go="otc"><small>OVER-THE-COUNTER</small><b>${otc.toLocaleString()}</b></button></div>
+    <div class="dgrid2"><div class="dbox"><div class="dh">My Meds${mine.length ? ` · ${mine.length}<button type="button" data-go="mine">See all ›</button>` : ""}</div>
+      ${mine.length ? mine.slice(0, 6).map(drow).join("") : `<div class="dempty">Nothing saved yet. Click <b>Add</b> in the menu, or <b>+ My Meds</b> on any medicine.</div>`}</div>
+      <div><div class="dbox"><div class="dh">Recently viewed${rec.length ? `<button type="button" data-go="clearrec">Clear</button>` : ""}</div>
+        ${rec.length ? `<div class="dchips">${rec.map(m => `<button type="button" data-id="${esc(m.id)}">${esc(m.title)}</button>`).join("")}</div>` : `<div class="dempty">Medicines you open will show here.</div>`}</div>
+      <button type="button" class="dix" data-go="ix"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="12" r="5"/><circle cx="15.5" cy="12" r="5"/></svg></span><span style="flex:1"><b>Interaction Checker</b><small>${ixn.length ? `${ixn.length} in your list: ${esc(ixn.slice(0, 3).join(", "))}${ixn.length > 3 ? "…" : ""} · continue` : "Check medicines, supplements, alcohol and food together"}</small></span>${chev}</button></div></div>`;
+}
+$("dash").addEventListener("click", e => {
+  const r = e.target.closest("[data-id]"); if (r) return go({ v: "card", id: r.dataset.id, name: "" });
+  const g = e.target.closest("[data-go]"); if (!g) return; const k = g.dataset.go;
+  if (k === "search") return $("wq").focus();
+  if (k === "rx" || k === "otc") return go({ v: "br", s: k });
+  if (k === "mine") return go({ v: "mine" });
+  if (k === "ix") { ixShown = IXL.length > 1; return go({ v: "ix" }); }
+  if (k === "clearrec") return $("recClear").click();
+});
+$("wq").addEventListener("input", () => renderSearch(WEB));
+$("wq").addEventListener("focus", () => { if ($("wq").value.trim()) renderSearch(WEB); });
+$("wdd").addEventListener("click", e => { const b = e.target.closest("button[data-id]"); if (b) { $("wdd").hidden = true; $("wq").blur(); go({ v: "card", id: b.dataset.id, name: "" }); } });
+$("wFilt").onclick = openSheet;
+// keyboard: "/" jumps to search, arrows move through the list, Enter opens, Esc closes
+addEventListener("keydown", e => {
+  const ae = document.activeElement, typing = ae && (ae.tagName === "INPUT" || ae.tagName === "TEXTAREA" || ae.tagName === "SELECT");
+  if (e.key === "/" && !typing && WIDE()) { e.preventDefault(); $("wq").focus(); $("wq").select(); return; }
+  const map = { wq: "wdd", q: "qdd", bq: "bdd" }, ddId = ae && map[ae.id]; if (!ddId) return;
+  const dd = $(ddId);
+  if (e.key === "Escape") { dd.hidden = true; ae.blur(); return; }
+  if (dd.hidden) return;
+  const rows = [...dd.querySelectorAll("button[data-id]")]; if (!rows.length) return;
+  let i = rows.findIndex(r => r.classList.contains("hl"));
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); rows[i]?.classList.remove("hl"); i = e.key === "ArrowDown" ? Math.min(rows.length - 1, i + 1) : Math.max(0, i - 1); rows[i].classList.add("hl"); rows[i].scrollIntoView({ block: "nearest" }); }
+  if (e.key === "Enter" && i >= 0) { e.preventDefault(); rows[i].click(); }
+});
 function tabSync() {   // highlight the tab for the page you're on
+  sideSync();
   const st = stack[navIdx] || {}, on = { listView: "home", brView: "home", mineView: "mine", ixView: "ix", setView: "set" }[CUR] || (CUR === "editView" && st.id === null ? "add" : "");
   document.querySelectorAll("#tabbar button").forEach(b => b.classList.toggle("on", b.dataset.t === on));
 }
@@ -1514,41 +1649,44 @@ $("imp").onchange = async e => {
       vx: (Math.random() - .5) * .12, vy: -.05 - Math.random() * .12, ax: Math.random() * 6.28, ay: Math.random() * 6.28,
       wx: (Math.random() - .5) * .012, wy: (Math.random() - .5) * .016 };
   }
+  let MSC = 1;   // molecule size: 1.5x on computers (they only float in the sidebar there)
   function drawMol(d, dark, colorful) {
+    const ds = d.s * MSC;
     const cx = Math.cos(d.ax), sx = Math.sin(d.ax), cy = Math.cos(d.ay), sy = Math.sin(d.ay);
     const P = d.m.a.map(([el, x, y, z]) => { const x1 = x * cy + z * sy, z1 = -x * sy + z * cy, y2 = y * cx - z1 * sx, z2 = y * sx + z1 * cx;
-      const k = 1 + z2 * .12; return [el, d.x + x1 * d.s * k, d.y + y2 * d.s * k, z2, k]; });
+      const k = 1 + z2 * .12; return [el, d.x + x1 * ds * k, d.y + y2 * ds * k, z2, k]; });
     ctx.globalAlpha = d.a * (dark ? .85 : .75);
     ctx.strokeStyle = dark ? "rgba(190,215,240,.75)" : "rgba(70,90,110,.7)"; ctx.lineCap = "round";
     for (const [i, j, n = 1] of d.m.b) {
       const [, x1, y1] = P[i], [, x2, y2] = P[j];
-      if (n === 1) { ctx.lineWidth = d.s * .16; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); continue; }
-      const len = Math.hypot(x2 - x1, y2 - y1) || 1, ox = -(y2 - y1) / len * d.s * .13, oy = (x2 - x1) / len * d.s * .13;   // double/triple bonds
-      ctx.lineWidth = d.s * .1;
+      if (n === 1) { ctx.lineWidth = ds * .16; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); continue; }
+      const len = Math.hypot(x2 - x1, y2 - y1) || 1, ox = -(y2 - y1) / len * ds * .13, oy = (x2 - x1) / len * ds * .13;   // double/triple bonds
+      ctx.lineWidth = ds * .1;
       for (let q = 0; q < n; q++) { const f = q - (n - 1) / 2; ctx.beginPath(); ctx.moveTo(x1 + ox * f * 2, y1 + oy * f * 2); ctx.lineTo(x2 + ox * f * 2, y2 + oy * f * 2); ctx.stroke(); }
     }
     for (const [el, x, y, , k] of P.slice().sort((p, q) => p[3] - q[3])) {
-      const r = ATOM[el][2] * d.s * k * 1.6; ctx.drawImage(atomSprite(dark, el, colorful), x - r, y - r, r * 2, r * 2);
+      const r = ATOM[el][2] * ds * k * 1.6; ctx.drawImage(atomSprite(dark, el, colorful), x - r, y - r, r * 2, r * 2);
     }
     ctx.globalAlpha = 1;
   }
   function drawDNA(t) {   // spins around its own axis: beads stay at their height and swing side to side, front side larger and brighter
     const mode = document.documentElement.dataset.mode === "dark" ? "dark" : "light", C = DNA_COL[mode];
-    const cx = W - 30, AMP = 16, TURN = 240 / (2 * Math.PI), OFF = 2.3, ph = still ? 0 : (t / 12000) * 2 * Math.PI;   // one turn every 12 s
+    const S = WIDE() ? 5 : 1, ST = 8 * S;   // on computers the helix is drawn 5x larger
+    const cx = W - 30 * S, AMP = 16 * S, TURN = 240 * S / (2 * Math.PI), OFF = 2.3, ph = still ? 0 : (t / 12000) * 2 * Math.PI;   // one turn every 12 s
     const pt = (y, sg) => { const a = y / TURN + ph + (sg > 0 ? 0 : OFF), z = Math.cos(a); return [cx + Math.sin(a) * AMP * (1 + .18 * z), z]; };
     const lit = z => (z + 1) / 2;
     ctx.lineCap = "round";
     const side = front => {
       for (const [sg, col] of [[1, C.s1], [-1, C.s2]]) {
-        for (let y = -8; y < H + 8; y += 8) {   // thin backbone between beads
-          const [x0, z0] = pt(y, sg), [x1, z1] = pt(y + 8, sg), z = (z0 + z1) / 2;
+        for (let y = -ST; y < H + ST; y += ST) {   // thin backbone between beads
+          const [x0, z0] = pt(y, sg), [x1, z1] = pt(y + ST, sg), z = (z0 + z1) / 2;
           if ((z >= 0) !== front) continue;
-          ctx.globalAlpha = C.a * (.15 + .5 * lit(z)); ctx.strokeStyle = col[1]; ctx.lineWidth = .6 + 1.2 * lit(z);
-          ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y + 8); ctx.stroke();
+          ctx.globalAlpha = C.a * (.15 + .5 * lit(z)); ctx.strokeStyle = col[1]; ctx.lineWidth = (.6 + 1.2 * lit(z)) * S;
+          ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y + ST); ctx.stroke();
         }
-        for (let y = 0; y < H + 8; y += 8) {    // beads: big and bright in front, small and dim behind
+        for (let y = 0; y < H + ST; y += ST) {    // beads: big and bright in front, small and dim behind
           const [x, z] = pt(y, sg); if ((z >= 0) !== front) continue;
-          const l = lit(z), r = 1.4 + 3.4 * l;
+          const l = lit(z), r = (1.4 + 3.4 * l) * S;
           if (l > .55) { ctx.globalAlpha = C.a * (l - .4); ctx.drawImage(glowSprite(col[1]), x - r * 3, y - r * 3, r * 6, r * 6); }
           const g = ctx.createRadialGradient(x - r * .35, y - r * .35, r * .1, x, y, r); g.addColorStop(0, col[1]); g.addColorStop(1, col[0]);
           ctx.globalAlpha = C.a * (.25 + .85 * l); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
@@ -1556,11 +1694,11 @@ $("imp").onchange = async e => {
       }
     };
     side(false);
-    for (let y = 4, i = 0; y < H + 8; y += 8, i++) {   // base-pair rungs
+    for (let y = ST / 2, i = 0; y < H + ST; y += ST, i++) {   // base-pair rungs
       const [xa, za] = pt(y, 1), [xb, zb] = pt(y, -1), z = (za + zb) / 2, mx = (xa + xb) / 2, [ba, bb] = SEQ[i % SEQ.length];
-      ctx.globalAlpha = C.a * (.15 + .6 * lit(z)); ctx.lineWidth = 1.6;
-      ctx.strokeStyle = C.bases[ba]; ctx.beginPath(); ctx.moveTo(xa, y); ctx.lineTo(mx - .8, y); ctx.stroke();
-      ctx.strokeStyle = C.bases[bb]; ctx.beginPath(); ctx.moveTo(mx + .8, y); ctx.lineTo(xb, y); ctx.stroke();
+      ctx.globalAlpha = C.a * (.15 + .6 * lit(z)); ctx.lineWidth = 1.6 * S;
+      ctx.strokeStyle = C.bases[ba]; ctx.beginPath(); ctx.moveTo(xa, y); ctx.lineTo(mx - .8 * S, y); ctx.stroke();
+      ctx.strokeStyle = C.bases[bb]; ctx.beginPath(); ctx.moveTo(mx + .8 * S, y); ctx.lineTo(xb, y); ctx.stroke();
     }
     side(true);
     ctx.globalAlpha = 1;
@@ -1574,17 +1712,22 @@ $("imp").onchange = async e => {
     ctx.clearRect(0, 0, W, H);
     // floating specks or molecules (Settings › Background)
     const dark = document.documentElement.dataset.mode === "dark";
-    if (FX.float !== "none") for (const d of dots) {
+    const web = WIDE(), SW = web ? parseFloat(getComputedStyle(document.body).getPropertyValue("--sidew")) || 232 : W;   // computers: molecules only in the sidebar
+    if (web) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, SW, H); ctx.clip(); }
+    MSC = web ? 1.5 : 1;
+    if (FX.float !== "none") for (const d of (web ? dots.slice(0, Math.max(5, Math.round(SW * H / 6500))) : dots)) {
       if (!still) {
         d.x += d.vx; d.y += d.vy; d.ax += d.wx; d.ay += d.wy;
-        if (d.y < -20) Object.assign(d, newMol(Math.random() * W, H + 20));
-        if (d.x < -20) d.x = W + 20; if (d.x > W + 20) d.x = -20;
+        if (d.y < -20) Object.assign(d, newMol(Math.random() * SW, H + 20));
+        if (web && d.x > SW + 20) d.x = Math.random() * SW;
+        if (d.x < -20) d.x = SW + 20; if (d.x > SW + 20) d.x = -20;
       }
       if (FX.float === "specks") {
         ctx.fillStyle = dark ? `rgba(150,195,240,${d.a * .8})` : `rgba(80,95,110,${d.a})`;
-        ctx.beginPath(); ctx.arc(d.x, d.y, .9 + (d.s - 5) * .36, 0, 7); ctx.fill();
+        ctx.beginPath(); ctx.arc(d.x, d.y, (.9 + (d.s - 5) * .36) * MSC, 0, 7); ctx.fill();
       } else drawMol(d, dark, FX.float === "color");
     }
+    if (web) ctx.restore();
     // DNA helix down the right edge, turning in place
     if (FX.dna) drawDNA(t);
     if (!still) requestAnimationFrame(frame);
